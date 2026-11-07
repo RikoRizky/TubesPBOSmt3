@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MeowPlace — Petshop Khusus Kucing</title>
+  <meta name="description" content="MeowPlace: petshop online khusus kucing. Makanan premium, camilan, mainan, dan perlengkapan original dengan pengiriman di hari yang sama.">
+  <meta name="theme-color" content="#F97316">
+
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="preload" as="image" href="./assets/images/hero-cat.webp">
+  <link rel="stylesheet" href="./assets/css/style.css">
+
+  <!-- tandai bahwa JS aktif: animasi reveal hanya menyembunyikan elemen jika JS jalan -->
+  <script>document.documentElement.classList.add('js');</script>
+</head>
+
+<body>
+
+  <!-- ========== IKON (SVG sprite) ========== -->
+  <svg class="sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.3A4.2 4.2 0 0 1 12 7.2a4.2 4.2 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20Z" /></symbol>
+    <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5.5 8h13l-1 12.5h-11L5.5 8Z" /><path d="M9 8V6.5a3 3 0 0 1 6 0V8" /></symbol>
+    <symbol id="i-bag-plus" viewBox="0 0 24 24"><path d="M5.5 8h13l-1 12.5h-11L5.5 8Z" /><path d="M9 8V6.5a3 3 0 0 1 6 0V8" /><path d="M12 11.5v5.5M9.25 14.25h5.5" /></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10" /></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" /></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></symbol>
+    <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6" /></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" /></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" /></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13" /></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 7.5v5.5M12 16.5v.01" /></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z" /></symbol>
+    <symbol id="i-paw" viewBox="0 0 24 24"><ellipse cx="12" cy="16.2" rx="5" ry="4.3" /><ellipse cx="5.4" cy="10.4" rx="2" ry="2.6" transform="rotate(-18 5.4 10.4)" /><ellipse cx="9.6" cy="6.2" rx="2.1" ry="2.8" transform="rotate(-6 9.6 6.2)" /><ellipse cx="14.4" cy="6.2" rx="2.1" ry="2.8" transform="rotate(6 14.4 6.2)" /><ellipse cx="18.6" cy="10.4" rx="2" ry="2.6" transform="rotate(18 18.6 10.4)" /></symbol>
+    <symbol id="i-fish" viewBox="0 0 24 24"><path d="M3 12c3-4.5 8.5-5.5 12.5-3L20 5.5v13L15.5 15C11.5 17.5 6 16.5 3 12Z" /><path d="M7.5 11.5v.01" /></symbol>
+    <symbol id="i-cat" viewBox="0 0 24 24"><path d="M5 9 4 3.5l4.5 3h7L20 3.5 19 9c.7 1 1 2.1 1 3.3C20 17 16.4 20 12 20s-8-3-8-7.7C4 11.1 4.3 10 5 9Z" /><path d="M9 12.5v.01M15 12.5v.01" /></symbol>
+    <symbol id="i-yarn" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /><path d="M5 9c4 0 9 3 11 10M7 17c2-5 6-9 12-9M10 4.5c-1 4 0 9 5 14" /></symbol>
+    <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c0-8 5-14 14-14 0 9-6 14-14 14Z" /><path d="m5 19 8-8" /></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3c.6 4.6 2.4 6.4 7 7-4.6.6-6.4 2.4-7 7-.6-4.6-2.4-6.4-7-7 4.6-.6 6.4-2.4 7-7Z" /></symbol>
+    <symbol id="i-instagram" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5" /><circle cx="12" cy="12" r="3.8" /><path d="M17 7v.01" /></symbol>
+    <symbol id="i-tiktok" viewBox="0 0 24 24"><path d="M14 3.5v11a3.5 3.5 0 1 1-3.5-3.5" /><path d="M14 3.5c.5 2.6 2.4 4.5 5 4.6" /></symbol>
+    <symbol id="i-youtube" viewBox="0 0 24 24"><rect x="2.5" y="5.5" width="19" height="13" rx="4" /><path d="m10 9.3 4.8 2.7-4.8 2.7V9.3Z" /></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19l-4 1Z" /></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z" /><circle cx="12" cy="9.5" r="2.5" /></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h3.5l2 5-2.4 1.5a11 11 0 0 0 5.4 5.4L15 13.5l5 2V19a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" /></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5" /><path d="m3.5 7.5 8.5 6 8.5-6" /></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 2" /></symbol>
+  </svg>
+
+  <a class="skip-link" href="#konten">Langsung ke konten</a>
+
+  <!-- progres gulir halaman -->
+  <div class="scroll-progress" aria-hidden="true"><span data-progress-bar></span></div>
+
+
+  <!-- ========== HEADER ========== -->
+  <header class="header" data-header>
+    <div class="container header-inner">
+
+      <a href="#beranda" class="logo" aria-label="MeowPlace, kembali ke beranda">
+        <svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true">
+          <path d="M8 15 6.5 4.5l8.5 6h10l8.5-6L32 15c1.6 2.2 2.5 4.6 2.5 7.2C34.5 30 28 35 20 35S5.5 30 5.5 22.2C5.5 19.6 6.4 17.2 8 15Z" fill="#F97316" />
+          <path d="M9.6 12.6 9 8.6l3.6 2.6ZM30.4 12.6l.6-4-3.6 2.6Z" fill="#FED7AA" />
+          <circle cx="14.5" cy="22" r="2.2" fill="#2B1B12" />
+          <circle cx="25.5" cy="22" r="2.2" fill="#2B1B12" />
+          <path d="M18.2 26.4h3.6L20 28.5Z" fill="#2B1B12" />
+        </svg>
+        <span class="logo-text">Meow<span>Place</span></span>
+      </a>
+
+      <nav class="navbar" id="navbar" data-navbar aria-label="Navigasi utama">
+        <div class="navbar-top">
+          <span class="logo-text">Meow<span>Place</span></span>
+          <button class="icon-btn" type="button" data-nav-close aria-label="Tutup menu">
+            <svg class="icon"><use href="#i-close" /></svg>
+          </button>
+        </div>
+
+        <ul class="navbar-list" data-nav-list>
+          <li><a href="#beranda" class="navbar-link" data-nav-link>Beranda</a></li>
+          <li><a href="#kategori" class="navbar-link" data-nav-link>Kategori</a></li>
+          <li><a href="#promo" class="navbar-link" data-nav-link>Promo</a></li>
+          <li><a href="#belanja" class="navbar-link" data-nav-link>Belanja</a></li>
+          <li><a href="#testimoni" class="navbar-link" data-nav-link>Testimoni</a></li>
+          <li class="nav-indicator" data-nav-indicator aria-hidden="true"></li>
+        </ul>
+
+        <div class="navbar-bottom">
+          <p>Butuh bantuan memilih?</p>
+          <a href="#kontak" class="navbar-contact" data-nav-link>
+            <svg class="icon"><use href="#i-chat" /></svg> Chat dokter hewan
+          </a>
+        </div>
+      </nav>
+
+      <div class="header-actions">
+        <button class="icon-btn" type="button" data-search-open aria-label="Cari produk" aria-keyshortcuts="/">
+          <svg class="icon"><use href="#i-search" /></svg>
+        </button>
+        <button class="icon-btn" type="button" data-wish-open aria-label="Lihat favorit">
+          <svg class="icon"><use href="#i-heart" /></svg>
+          <span class="count-badge" data-wish-count hidden>0</span>
+        </button>
+        <button class="icon-btn" type="button" data-cart-open aria-label="Buka keranjang" aria-controls="keranjang">
+          <svg class="icon"><use href="#i-bag" /></svg>
+          <span class="count-badge" data-cart-count hidden>0</span>
+        </button>
+        <button class="icon-btn nav-toggle" type="button" data-nav-open aria-label="Buka menu" aria-controls="navbar" aria-expanded="false">
+          <svg class="icon"><use href="#i-menu" /></svg>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+
+  <!-- ========== PENCARIAN ========== -->
+  <div class="search-panel" data-search role="dialog" aria-modal="true" aria-label="Cari produk" inert>
+    <div class="container">
+      <form class="search-form" data-search-form role="search">
+        <svg class="icon"><use href="#i-search" /></svg>
+        <input type="search" class="search-input" data-search-input placeholder="Cari makanan, camilan, mainan…" aria-label="Kata kunci pencarian" autocomplete="off">
+        <kbd class="search-kbd">Esc</kbd>
+        <button type="button" class="icon-btn" data-search-close aria-label="Tutup pencarian">
+          <svg class="icon"><use href="#i-close" /></svg>
+        </button>
+      </form>
+      <div class="search-body" data-search-results aria-live="polite"></div>
+    </div>
+  </div>
+
+  <div class="overlay" data-overlay hidden></div>
+
+
+  <main id="konten">
+    <article>
+
+      <!-- ========== HERO ========== -->
+      <section class="hero" id="beranda" aria-labelledby="hero-title" data-section>
+        <div class="container hero-grid">
+
+          <div class="hero-content">
+            <p class="eyebrow hero-eyebrow">
+              <svg class="icon icon--fill"><use href="#i-paw" /></svg>
+              Petshop khusus kucing<span class="eyebrow-extra"> · Diskon s.d. 40%</span>
+            </p>
+
+            <h1 class="hero-title" id="hero-title">
+              <span class="hero-line"><span>Makan enak,</span></span>
+              <span class="hero-line"><span>main seru,</span></span>
+              <span class="hero-line"><span>meong <span class="hl">bahagia<svg class="hl-underline" viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path d="M4 14C48 6 120 3 196 9" pathLength="1" /></svg></span>.</span></span>
+            </h1>
+
+            <p class="hero-text">
+              Makanan premium, camilan, mainan, dan perlengkapan pilihan dokter hewan.
+              Semuanya original dan dikirim di hari yang sama.
+            </p>
+
+            <div class="hero-actions">
+              <a href="#belanja" class="btn btn-primary">
+                Belanja Sekarang
+                <svg class="icon icon-arrow"><use href="#i-arrow-right" /></svg>
+              </a>
+              <a href="#kategori" class="btn btn-ghost">Lihat Kategori</a>
+            </div>
+
+            <ul class="hero-stats">
+              <li>
+                <strong><span data-count="12000">12.000</span>+</strong>
+                <span>kucing bahagia</span>
+              </li>
+              <li>
+                <strong><span data-count="4.9" data-decimals="1">4,9</span><small>/5</small></strong>
+                <span>rating pembeli</span>
+              </li>
+              <li>
+                <strong><span data-count="350">350</span>+</strong>
+                <span>produk original</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="hero-visual" data-hero-visual>
+            <div class="hero-orbit" data-parallax="-0.05" aria-hidden="true"></div>
+
+            <div class="hero-figure" data-parallax="0.06">
+              <div class="hero-circle" aria-hidden="true"></div>
+              <div class="hero-cat-clip">
+                <img src="./assets/images/hero-cat.webp" width="696" height="657" class="hero-cat" fetchpriority="high"
+                  alt="Kucing oranye menjilat bibir sambil menatap ke atas">
+              </div>
+            </div>
+
+            <div class="float-card float-card--product" data-parallax="0.16">
+              <div class="float-card-art" data-art="bag:orange"></div>
+              <div>
+                <p class="float-card-title">Salmon Kitten</p>
+                <p class="float-card-price"><strong>Rp145rb</strong> <s>Rp189rb</s></p>
+              </div>
+              <span class="float-card-tag">-23%</span>
+            </div>
+
+            <div class="float-card float-card--rating" data-parallax="-0.12">
+              <span class="float-card-icon"><svg class="icon icon--fill"><use href="#i-star" /></svg></span>
+              <div>
+                <p class="float-card-title">4,9 dari 5</p>
+                <p class="float-card-meta">2.300+ ulasan</p>
+              </div>
+            </div>
+
+            <svg class="hero-paw hero-paw--1" data-parallax="0.22" aria-hidden="true"><use href="#i-paw" /></svg>
+            <svg class="hero-paw hero-paw--2" data-parallax="0.1" aria-hidden="true"><use href="#i-paw" /></svg>
+            <svg class="hero-paw hero-paw--3" data-parallax="0.3" aria-hidden="true"><use href="#i-paw" /></svg>
+          </div>
+
+        </div>
+
+        <svg class="hero-wave" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 40C180 80 360 80 540 52S900 0 1080 12s300 52 360 60v8H0Z" />
+        </svg>
+      </section>
+
+
+      <!-- ========== MARQUEE (reaktif terhadap kecepatan gulir) ========== -->
+      <div class="marquee" data-marquee aria-label="Keunggulan MeowPlace">
+        <div class="marquee-track" data-marquee-track>
+          <ul class="marquee-group">
+            <li>Gratis ongkir min. Rp150rb</li>
+            <li aria-hidden="true"><svg class="icon icon--fill"><use href="#i-paw" /></svg></li>
+            <li>100% produk original</li>
+            <li aria-hidden="true"><svg class="icon icon--fill"><use href="#i-paw" /></svg></li>
+            <li>Kirim di hari yang sama</li>
+            <li aria-hidden="true"><svg class="icon icon--fill"><use href="#i-paw" /></svg></li>
+            <li>Konsultasi dokter hewan gratis</li>
+            <li aria-hidden="true"><svg class="icon icon--fill"><use href="#i-paw" /></svg></li>
+            <li>Garansi lahap 14 hari</li>
+            <li aria-hidden="true"><svg class="icon icon--fill"><use href="#i-paw" /></svg></li>
+          </ul>
+        </div>
+      </div>
+
+
+      <!-- ========== KATEGORI ========== -->
+      <section class="section category" id="kategori" aria-labelledby="kategori-title" data-section>
+        <div class="container">
+
+          <div class="section-head">
+            <div data-reveal="up">
+              <p class="eyebrow">Kategori</p>
+              <h2 class="section-title" id="kategori-title">Belanja sesuai <span class="hl">kebutuhan</span></h2>
+              <p class="section-sub">Dari kitten sampai senior, temukan yang paling pas untuk si meong.</p>
+            </div>
+            <a href="#belanja" class="link-arrow" data-reveal="fade">
+              Lihat semua produk
+              <svg class="icon"><use href="#i-arrow-right" /></svg>
+            </a>
+          </div>
+
+          <ul class="category-list" data-stagger>
+            <li data-reveal="up">
+              <a href="#belanja" class="category-card" data-filter-link="makanan" style="--tint:#FFE9D6">
+                <div class="category-art" data-art="bag:orange"></div>
+                <h3 class="category-name">Makanan Kering</h3>
+                <p class="category-count">86 produk</p>
+                <span class="category-arrow" aria-hidden="true"><svg class="icon"><use href="#i-arrow-right" /></svg></span>
+              </a>
+            </li>
+            <li data-reveal="up">
+              <a href="#belanja" class="category-card" data-filter-link="makanan" style="--tint:#FFF1CC">
+                <div class="category-art" data-art="can:tangerine"></div>
+                <h3 class="category-name">Makanan Basah</h3>
+                <p class="category-count">64 produk</p>
+                <span class="category-arrow" aria-hidden="true"><svg class="icon"><use href="#i-arrow-right" /></svg></span>
+              </a>
+            </li>
+            <li data-reveal="up">
+              <a href="#belanja" class="category-card" data-filter-link="camilan" style="--tint:#FDE5DC">
+                <div class="category-art" data-art="pouch:rust"></div>
+                <h3 class="category-name">Camilan</h3>
+                <p class="category-count">52 produk</p>
+                <span class="category-arrow" aria-hidden="true"><svg class="icon"><use href="#i-arrow-right" /></svg></span>
+              </a>
+            </li>
+            <li data-reveal="up">
+              <a href="#belanja" class="category-card" data-filter-link="mainan" style="--tint:#F6ECE1">
+                <div class="category-art" data-art="yarn:orange"></div>
+                <h3 class="category-name">Mainan</h3>
+                <p class="category-count">71 produk</p>
+                <span class="category-arrow" aria-hidden="true"><svg class="icon"><use href="#i-arrow-right" /></svg></span>
+              </a>
+            </li>
+            <li data-reveal="up">
+              <a href="#belanja" class="category-card" data-filter-link="perlengkapan" style="--tint:#FFE9D6">
+                <div class="category-art" data-art="litter:honey"></div>
+                <h3 class="category-name">Pasir &amp; Kebersihan</h3>
+                <p class="category-count">38 produk</p>
+                <span class="category-arrow" aria-hidden="true"><svg class="icon"><use href="#i-arrow-right" /></svg></span>
+              </a>
+            </li>
+            <li data-reveal="up">
+              <a href="#belanja" class="category-card" data-filter-link="perlengkapan" style="--tint:#FDE5DC">
+                <div class="category-art" data-art="bed:cream"></div>
+                <h3 class="category-name">Kasur &amp; Aksesoris</h3>
+                <p class="category-count">45 produk</p>
+                <span class="category-arrow" aria-hidden="true"><svg class="icon"><use href="#i-arrow-right" /></svg></span>
+              </a>
+            </li>
+          </ul>
+
+        </div>
+      </section>
+
+
+      <!-- ========== PROMO (bento) ========== -->
+      <section class="section offer" id="promo" aria-labelledby="promo-title" data-section>
+        <div class="container">
+
+          <div class="section-head">
+            <div data-reveal="up">
+              <p class="eyebrow">Promo minggu ini</p>
+              <h2 class="section-title" id="promo-title">Hemat lebih banyak, <span class="hl">purr</span> lebih keras</h2>
+            </div>
+          </div>
+
+          <div class="offer-grid">
+
+            <div class="offer-card offer-card--big" data-reveal="clip">
+              <div class="offer-content">
+                <p class="offer-eyebrow">Paket hemat</p>
+                <h3 class="offer-title">Kitten Starter Kit</h3>
+                <p class="offer-text">Makanan, pasir, mainan, dan kasur. Semua yang dibutuhkan anak bulu barumu, dalam satu kotak.</p>
+                <p class="offer-price"><strong>Rp249.000</strong> <s>Rp332.000</s></p>
+                <a href="#belanja" class="btn btn-primary btn-sm">
+                  Lihat Paket <svg class="icon icon-arrow"><use href="#i-arrow-right" /></svg>
+                </a>
+              </div>
+              <div class="offer-media">
+                <img src="./assets/images/offer-kittens.jpg" width="900" height="735" loading="lazy" decoding="async" data-parallax-img
+                  alt="Lima anak kucing di dalam keranjang anyaman">
+              </div>
+            </div>
+
+            <div class="offer-card offer-card--toys" data-reveal="clip">
+              <div class="offer-content">
+                <p class="offer-eyebrow">Diskon 30%</p>
+                <h3 class="offer-title">Mainan biar nggak mager</h3>
+                <a href="#belanja" class="btn btn-primary btn-sm" data-filter-link="mainan">
+                  Belanja Mainan <svg class="icon icon-arrow"><use href="#i-arrow-right" /></svg>
+                </a>
+              </div>
+              <div class="offer-media offer-media--framed">
+                <img src="./assets/images/offer-toys.jpg" width="700" height="760" loading="lazy" decoding="async" data-parallax-img
+                  alt="Kucing oranye sedang meregangkan badan">
+              </div>
+            </div>
+
+            <div class="offer-card offer-card--member" data-reveal="clip">
+              <div class="offer-content">
+                <p class="offer-eyebrow">Member baru</p>
+                <h3 class="offer-title">Potongan Rp50rb order pertama</h3>
+                <a href="#kontak" class="btn btn-primary btn-sm">
+                  Daftar Gratis <svg class="icon icon-arrow"><use href="#i-arrow-right" /></svg>
+                </a>
+              </div>
+              <div class="offer-media offer-media--fade">
+                <img src="./assets/images/offer-member.jpg" width="700" height="700" loading="lazy" decoding="async" data-parallax-img
+                  alt="Kucing oranye berdiri dengan ekor tegak di latar kuning">
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ========== PRODUK TERLARIS ========== -->
+      <section class="section product" id="belanja" aria-labelledby="belanja-title" data-section>
+        <div class="container">
+
+          <div class="section-head">
+            <div data-reveal="up">
+              <p class="eyebrow">Terlaris</p>
+              <h2 class="section-title" id="belanja-title">Paling <span class="hl">laris</span> minggu ini</h2>
+              <p class="section-sub">Dipilih ribuan pemilik kucing, dicek kualitasnya oleh tim dokter hewan kami.</p>
+            </div>
+
+            <div class="filter-tabs" role="tablist" aria-label="Filter kategori produk" data-filter-tabs data-reveal="fade">
+              <button class="filter-tab" role="tab" type="button" aria-selected="true" data-filter="semua">Semua</button>
+              <button class="filter-tab" role="tab" type="button" aria-selected="false" data-filter="makanan">Makanan</button>
+              <button class="filter-tab" role="tab" type="button" aria-selected="false" data-filter="camilan">Camilan</button>
+              <button class="filter-tab" role="tab" type="button" aria-selected="false" data-filter="mainan">Mainan</button>
+              <button class="filter-tab" role="tab" type="button" aria-selected="false" data-filter="perlengkapan">Perlengkapan</button>
+              <button class="filter-tab" role="tab" type="button" aria-selected="false" data-filter="favorit">
+                <svg class="icon"><use href="#i-heart" /></svg> Favorit
+              </button>
+              <span class="filter-indicator" data-filter-indicator aria-hidden="true"></span>
+            </div>
+          </div>
+
+          <div class="product-grid" data-product-grid aria-live="polite" aria-busy="true">
+            <noscript><p class="grid-message">Aktifkan JavaScript untuk melihat daftar produk.</p></noscript>
+          </div>
+
+          <div class="product-more">
+            <button class="btn btn-ghost" type="button" data-load-more hidden>
+              Tampilkan lebih banyak <span class="btn-meta" data-load-more-count></span>
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- ========== LAYANAN ========== -->
+      <section class="section service" aria-labelledby="layanan-title" data-section>
+        <div class="paw-trail" data-paw-trail aria-hidden="true"></div>
+
+        <div class="container service-grid">
+
+          <div class="service-intro" data-reveal="up">
+            <p class="eyebrow">Kenapa MeowPlace</p>
+            <h2 class="section-title" id="layanan-title">Belanja tenang, <span class="hl">kucing senang</span>.</h2>
+            <p class="section-sub">
+              Kami cuma jualan untuk kucing, jadi kami tahu persis apa yang mereka butuhkan.
+              Setiap produk dipilih bersama dokter hewan, disimpan dengan benar, dan dikirim secepat mungkin.
+            </p>
+            <a href="#kontak" class="link-arrow">
+              Tanya dokter hewan kami
+              <svg class="icon"><use href="#i-arrow-right" /></svg>
+            </a>
+          </div>
+
+          <ul class="service-list" data-stagger>
+            <li class="service-card" data-reveal="up">
+              <span class="service-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M3 6.5h11v9.5H3z" /><path pathLength="1" d="M14 10h4l3 3.5V16h-7" /><circle pathLength="1" cx="7" cy="17.5" r="1.8" /><circle pathLength="1" cx="17.5" cy="17.5" r="1.8" /></svg>
+              </span>
+              <h3 class="service-title">Kirim di hari yang sama</h3>
+              <p class="service-text">Pesan sebelum 14.00, sampai sore ini untuk area Jabodetabek.</p>
+            </li>
+            <li class="service-card" data-reveal="up">
+              <span class="service-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M4 9h11a5 5 0 0 1 0 10H8" /><path pathLength="1" d="m8 5-4 4 4 4" /></svg>
+              </span>
+              <h3 class="service-title">Retur 30 hari</h3>
+              <p class="service-text">Nggak cocok? Tukar atau kembalikan tanpa ribet.</p>
+            </li>
+            <li class="service-card" data-reveal="up">
+              <span class="service-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6l-7-3Z" /><path pathLength="1" d="m9 12 2 2 4-4" /></svg>
+              </span>
+              <h3 class="service-title">Pembayaran aman</h3>
+              <p class="service-text">QRIS, e-wallet, transfer bank, sampai COD. Semua terenkripsi.</p>
+            </li>
+            <li class="service-card" data-reveal="up">
+              <span class="service-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M4 20l1.3-3.9A8 8 0 1 1 8 19l-4 1Z" /><path pathLength="1" d="M12 14.5s-3-1.8-3-3.8a1.6 1.6 0 0 1 3-.8 1.6 1.6 0 0 1 3 .8c0 2-3 3.8-3 3.8Z" /></svg>
+              </span>
+              <h3 class="service-title">Konsultasi dokter hewan</h3>
+              <p class="service-text">Tanya seputar nutrisi dan kesehatan, gratis 24/7 lewat chat.</p>
+            </li>
+          </ul>
+
+        </div>
+      </section>
+
+
+      <!-- ========== TESTIMONI (galeri horizontal mengikuti gulir) ========== -->
+      <section class="section gallery" id="testimoni" aria-labelledby="testimoni-title" data-section data-gallery>
+        <div class="container">
+          <div class="section-head section-head--center" data-reveal="up">
+            <p class="eyebrow">#KeluargaMeow</p>
+            <h2 class="section-title" id="testimoni-title">Cerita dari <span class="hl">12.000+</span> pemilik kucing</h2>
+            <p class="section-sub">Mereka yang paling jujur menilai produk kami. Ya, kucingnya.</p>
+          </div>
+        </div>
+
+        <div class="gallery-rows">
+          <ul class="gallery-row" data-gallery-row="1">
+            <li class="polaroid" style="--r:-2deg">
+              <img src="./assets/images/cat-mochi.jpg" width="480" height="600" loading="lazy" decoding="async" alt="Mochi, kucing putih belang dengan bandana kuning, tersenyum">
+              <div class="polaroid-body">
+                <p class="polaroid-name">Mochi <span>· Bandung</span></p>
+                <p class="polaroid-quote">“Langsung lahap Salmon Kitten-nya. Paket sampai sehari setelah pesan!”</p>
+              </div>
+            </li>
+            <li class="polaroid" style="--r:1.5deg">
+              <img src="./assets/images/cat-oyen.jpg" width="480" height="600" loading="lazy" decoding="async" alt="Oyen, kucing oranye berguling manja">
+              <div class="polaroid-body">
+                <p class="polaroid-name">Oyen <span>· Jakarta</span></p>
+                <p class="polaroid-quote">“Kasur donatnya jadi tempat tidur siang favorit. Lembut banget.”</p>
+              </div>
+            </li>
+            <li class="polaroid" style="--r:-1deg">
+              <img src="./assets/images/cat-kopi.jpg" width="480" height="600" loading="lazy" decoding="async" alt="Kopi, kucing abu-abu berkacamata hitam">
+              <div class="polaroid-body">
+                <p class="polaroid-name">Kopi <span>· Yogyakarta</span></p>
+                <p class="polaroid-quote">“Tongkat bulunya bikin Kopi aktif lagi tiap sore.”</p>
+              </div>
+            </li>
+            <li class="polaroid" style="--r:2deg">
+              <img src="./assets/images/cat-bubu.jpg" width="480" height="600" loading="lazy" decoding="async" alt="Bubu, anak kucing tabby duduk di lantai">
+              <div class="polaroid-body">
+                <p class="polaroid-name">Bubu <span>· Surabaya</span></p>
+                <p class="polaroid-quote">“Paket kitten starter lengkap, pas buat pemula kayak aku.”</p>
+              </div>
+            </li>
+            <li class="polaroid" style="--r:-1.5deg">
+              <img src="./assets/images/cat-simba.jpg" width="480" height="600" loading="lazy" decoding="async" alt="Simba, kucing oranye berbulu panjang di atas meja">
+              <div class="polaroid-body">
+                <p class="polaroid-name">Simba <span>· Semarang</span></p>
+                <p class="polaroid-quote">“Menara garukannya kokoh. Sofa di rumah akhirnya selamat.”</p>
+              </div>
+            </li>
+            <li class="polaroid" style="--r:1deg">
+              <img src="./assets/images/cat-luna.jpg" width="480" height="600" loading="lazy" decoding="async" alt="Luna, anak kucing putih dengan ekspresi terkejut">
+              <div class="polaroid-body">
+                <p class="polaroid-name">Luna <span>· Malang</span></p>
+                <p class="polaroid-quote">“CS-nya sabar bantu pilih makanan untuk perut sensitif.”</p>
+              </div>
+            </li>
+            <li class="polaroid" style="--r:-2deg">
+              <img src="./assets/images/cat-tahu.jpg" width="480" height="600" loading="lazy" decoding="async" alt="Tahu, kucing oranye tidur di lantai kayu">
+              <div class="polaroid-body">
+                <p class="polaroid-name">Tahu <span>· Bekasi</span></p>
+                <p class="polaroid-quote">“Pasir lavendernya wangi dan gumpalannya gampang diserok.”</p>
+              </div>
+            </li>
+            <li class="polaroid" style="--r:1.5deg">
+              <img src="./assets/images/cat-mbul.jpg" width="480" height="600" loading="lazy" decoding="async" alt="Mbul, kucing persia berwajah cemberut">
+              <div class="polaroid-body">
+                <p class="polaroid-name">Mbul <span>· Depok</span></p>
+                <p class="polaroid-quote">“Si pemilih ini ternyata doyan Tuna Pâté. Ajaib!”</p>
+              </div>
+            </li>
+            <li class="polaroid" style="--r:-1deg">
+              <img src="./assets/images/cat-cimol.jpg" width="480" height="600" loading="lazy" decoding="async" alt="Cimol, kucing tabby sedang menguap lebar">
+              <div class="polaroid-body">
+                <p class="polaroid-name">Cimol <span>· Bogor</span></p>
+                <p class="polaroid-quote">“Air mancurnya bikin Cimol jadi rajin minum.”</p>
+              </div>
+            </li>
+            <li class="polaroid" style="--r:2deg">
+              <img src="./assets/images/cat-snowy.jpg" width="480" height="600" loading="lazy" decoding="async" alt="Snowy, kucing berbulu lebat memakai kalung">
+              <div class="polaroid-body">
+                <p class="polaroid-name">Snowy <span>· Medan</span></p>
+                <p class="polaroid-quote">“Pengemasan rapi dan semua produknya original.”</p>
+              </div>
+            </li>
+          </ul>
+
+          <!-- baris kedua diisi otomatis oleh JS (salinan dekoratif, urutan berbeda) -->
+          <ul class="gallery-row gallery-row--reverse" data-gallery-row="2" aria-hidden="true"></ul>
+        </div>
+      </section>
+
+
+      <!-- ========== CTA: GARANSI LAHAP ========== -->
+      <section class="section cta" aria-labelledby="cta-title" data-section data-cta>
+        <div class="container">
+          <div class="cta-card" data-cta-card>
+
+            <div class="cta-content">
+              <p class="eyebrow eyebrow--light">Garansi Lahap</p>
+              <h2 class="section-title cta-title" id="cta-title">Nggak doyan? <span class="hl">Kami ganti.</span></h2>
+              <p class="cta-text">
+                Kalau si meong menolak makanan yang kamu beli, kirim fotonya dalam 14 hari.
+                Kami tukar dengan rasa lain atau uangmu kembali. Tanpa drama.
+              </p>
+              <ul class="cta-points">
+                <li><svg class="icon"><use href="#i-check" /></svg> Berlaku untuk semua makanan &amp; camilan</li>
+                <li><svg class="icon"><use href="#i-check" /></svg> Kemasan sudah dibuka tetap bisa</li>
+                <li><svg class="icon"><use href="#i-check" /></svg> Diproses kurang dari 48 jam</li>
+              </ul>
+              <div class="cta-actions">
+                <a href="#belanja" class="btn btn-orange" data-filter-link="makanan">
+                  Belanja Makanan <svg class="icon icon-arrow"><use href="#i-arrow-right" /></svg>
+                </a>
+                <a href="bantuan.html#pengembalian" class="btn btn-outline-light">Syarat garansi</a>
+              </div>
+            </div>
+
+            <div class="cta-media">
+              <img src="./assets/images/cta-cat.jpg" width="1000" height="800" loading="lazy" decoding="async"
+                alt="Kucing oranye berbaring santai menatap kamera">
+              <div class="cta-sticker" data-sticker aria-hidden="true">
+                <svg viewBox="0 0 120 120">
+                  <defs>
+                    <path id="sticker-circle" d="M60 60m-44 0a44 44 0 1 1 88 0a44 44 0 1 1-88 0" />
+                  </defs>
+                  <circle cx="60" cy="60" r="58" />
+                  <text><textPath href="#sticker-circle" textLength="272" lengthAdjust="spacing">GARANSI LAHAP • UANG KEMBALI • </textPath></text>
+                </svg>
+                <svg class="cta-sticker-paw"><use href="#i-paw" /></svg>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ========== BRAND ========== -->
+      <section class="section brand" aria-labelledby="brand-title" data-section>
+        <div class="container">
+          <h2 class="brand-title" id="brand-title" data-reveal="fade">Brand favorit pilihan dokter hewan</h2>
+          <ul class="brand-list" data-stagger>
+            <li class="brand-item" data-reveal="up"><svg class="icon"><use href="#i-cat" /></svg> Purrfecto</li>
+            <li class="brand-item" data-reveal="up"><svg class="icon"><use href="#i-fish" /></svg> Whiskerz</li>
+            <li class="brand-item" data-reveal="up"><svg class="icon icon--fill"><use href="#i-paw" /></svg> Tabby&amp;Co</li>
+            <li class="brand-item" data-reveal="up"><svg class="icon"><use href="#i-yarn" /></svg> Nyaww</li>
+            <li class="brand-item" data-reveal="up"><svg class="icon"><use href="#i-leaf" /></svg> Kitto Labs</li>
+            <li class="brand-item" data-reveal="up"><svg class="icon"><use href="#i-sparkle" /></svg> Felino</li>
+          </ul>
+        </div>
+      </section>
+
+    </article>
+  </main>
+
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer" id="kontak" data-section>
+    <div class="container">
+
+      <div class="newsletter" data-reveal="up">
+        <div class="newsletter-copy">
+          <h2 class="newsletter-title">Gabung Klub Meow, hemat 10%.</h2>
+          <p>Kode diskon untuk pesanan pertama, info promo, dan tips merawat kucing. Maksimal 2 email per bulan.</p>
+        </div>
+        <form class="newsletter-form" data-newsletter novalidate>
+          <div class="input-wrap">
+            <svg class="icon"><use href="#i-mail" /></svg>
+            <label for="nl-email" class="sr-only">Alamat email</label>
+            <input id="nl-email" type="email" name="email" placeholder="email@kamu.com" autocomplete="email" required aria-describedby="nl-msg">
+          </div>
+          <button class="btn btn-primary" type="submit" data-newsletter-btn>Daftar</button>
+          <p class="form-msg" id="nl-msg" data-newsletter-msg aria-live="polite"></p>
+        </form>
+      </div>
+
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="#beranda" class="logo logo--light" aria-label="MeowPlace, kembali ke beranda">
+            <svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true">
+              <path d="M8 15 6.5 4.5l8.5 6h10l8.5-6L32 15c1.6 2.2 2.5 4.6 2.5 7.2C34.5 30 28 35 20 35S5.5 30 5.5 22.2C5.5 19.6 6.4 17.2 8 15Z" fill="#F97316" />
+              <path d="M9.6 12.6 9 8.6l3.6 2.6ZM30.4 12.6l.6-4-3.6 2.6Z" fill="#FED7AA" />
+              <circle cx="14.5" cy="22" r="2.2" fill="#2B1B12" />
+              <circle cx="25.5" cy="22" r="2.2" fill="#2B1B12" />
+              <path d="M18.2 26.4h3.6L20 28.5Z" fill="#2B1B12" />
+            </svg>
+            <span class="logo-text">Meow<span>Place</span></span>
+          </a>
+          <p class="footer-text">Petshop online khusus kucing. Produk original, dikirim dengan penuh cinta sejak 2019.</p>
+          <ul class="social-list">
+            <li><a href="#" class="social-link" aria-label="Instagram"><svg class="icon"><use href="#i-instagram" /></svg></a></li>
+            <li><a href="#" class="social-link" aria-label="TikTok"><svg class="icon"><use href="#i-tiktok" /></svg></a></li>
+            <li><a href="#" class="social-link" aria-label="YouTube"><svg class="icon"><use href="#i-youtube" /></svg></a></li>
+            <li><a href="#" class="social-link" aria-label="WhatsApp"><svg class="icon"><use href="#i-chat" /></svg></a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <p class="footer-heading">Belanja</p>
+          <ul class="footer-links">
+            <li><a href="#belanja" data-filter-link="makanan">Makanan</a></li>
+            <li><a href="#belanja" data-filter-link="camilan">Camilan</a></li>
+            <li><a href="#belanja" data-filter-link="mainan">Mainan</a></li>
+            <li><a href="#belanja" data-filter-link="perlengkapan">Perlengkapan</a></li>
+            <li><a href="#promo">Promo</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <p class="footer-heading">Bantuan</p>
+          <ul class="footer-links">
+            <li><a href="bantuan.html#cara-belanja">Cara belanja</a></li>
+            <li><a href="bantuan.html#lacak-pesanan">Lacak pesanan</a></li>
+            <li><a href="bantuan.html#pengembalian">Pengembalian</a></li>
+            <li><a href="bantuan.html#faq">FAQ</a></li>
+            <li><a href="bantuan.html#syarat-ketentuan">Syarat &amp; ketentuan</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <p class="footer-heading">Kontak</p>
+          <ul class="footer-contact">
+            <li><svg class="icon"><use href="#i-pin" /></svg> Jl. Tabby Raya No. 9, Jakarta Selatan</li>
+            <li><svg class="icon"><use href="#i-phone" /></svg> 0812-3456-7890</li>
+            <li><svg class="icon"><use href="#i-mail" /></svg> halo@meowplace.id</li>
+            <li><svg class="icon"><use href="#i-clock" /></svg> Setiap hari, 08.00–21.00 WIB</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© <span data-year>2026</span> MeowPlace. Dibuat sepenuh hati untuk para anabul.</p>
+        <ul class="pay-list" aria-label="Metode pembayaran">
+          <li>QRIS</li><li>GoPay</li><li>OVO</li><li>DANA</li><li>Transfer Bank</li><li>COD</li>
+        </ul>
+      </div>
+
+    </div>
+  </footer>
+
+
+  <!-- ========== KERANJANG (drawer) ========== -->
+  <aside class="drawer" id="keranjang" data-cart role="dialog" aria-modal="true" aria-labelledby="cart-title" inert>
+    <div class="drawer-head">
+      <h2 class="drawer-title" id="cart-title">Keranjang <span data-cart-total-qty></span></h2>
+      <button class="icon-btn" type="button" data-cart-close aria-label="Tutup keranjang">
+        <svg class="icon"><use href="#i-close" /></svg>
+      </button>
+    </div>
+
+    <div class="ship-progress" data-ship>
+      <p class="ship-text" data-ship-text></p>
+      <div class="ship-bar"><span data-ship-bar></span></div>
+    </div>
+
+    <ul class="cart-list" data-cart-list></ul>
+
+    <div class="cart-empty" data-cart-empty>
+      <div class="cart-empty-art" data-art="bed:cream"></div>
+      <h3>Keranjangmu masih kosong</h3>
+      <p>Si meong lagi tidur siang. Yuk, siapkan camilan buat waktu dia bangun.</p>
+      <a href="#belanja" class="btn btn-primary btn-sm" data-cart-close>Mulai Belanja</a>
+    </div>
+
+    <div class="drawer-foot" data-cart-foot>
+      <div class="cart-row">
+        <span>Subtotal</span>
+        <strong data-cart-subtotal>Rp0</strong>
+      </div>
+      <p class="cart-note">Ongkir dan voucher dihitung saat checkout.</p>
+      <button class="btn btn-primary btn-block" type="button" data-checkout>
+        Checkout <svg class="icon icon-arrow"><use href="#i-arrow-right" /></svg>
+      </button>
+    </div>
+  </aside>
+
+
+  <!-- tombol kembali ke atas dengan cincin progres -->
+  <a href="#beranda" class="back-top" data-back-top aria-label="Kembali ke atas">
+    <svg class="back-top-ring" viewBox="0 0 52 52" aria-hidden="true">
+      <circle cx="26" cy="26" r="24" pathLength="1" />
+      <circle cx="26" cy="26" r="24" pathLength="1" data-back-top-ring />
+    </svg>
+    <svg class="icon"><use href="#i-arrow-up" /></svg>
+  </a>
+
+  <!-- notifikasi -->
+  <div class="toast-stack" data-toasts aria-live="polite" aria-atomic="false"></div>
+
+
+  <script src="./assets/js/illustrations.js"></script>
+  <script src="./assets/js/data.js"></script>
+  <script src="./assets/js/script.js"></script>
+
+</body>
+
+</html>
