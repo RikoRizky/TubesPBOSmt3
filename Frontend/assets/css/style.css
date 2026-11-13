@@ -910,6 +910,12 @@ button:disabled { cursor: not-allowed; }
   animation: itemIn 400ms var(--ease-out) both;
 }
 
+.cart-loading {
+  padding-block: 16px;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
 .cart-item.is-removing {
   animation: itemOut 260ms var(--ease-in-out) forwards;
 }

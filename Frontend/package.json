@@ -1,0 +1,16 @@
+{
+  "name": "meowplace-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Frontend MeowPlace (TypeScript + OOP) — petshop khusus kucing",
+  "scripts": {
+    "build": "npm run typecheck && npm run bundle",
+    "bundle": "esbuild src/main.ts --bundle --format=iife --target=es2022 --sourcemap --outfile=assets/js/app.js",
+    "dev": "npm run bundle -- --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
+}

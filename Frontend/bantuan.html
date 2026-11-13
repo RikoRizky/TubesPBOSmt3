@@ -20,7 +20,7 @@
   <script>document.documentElement.classList.add('js');</script>
 </head>
 
-<body>
+<body data-page="bantuan">
 
   <!-- ========== IKON (SVG sprite) ========== -->
   <svg class="sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
@@ -334,7 +334,7 @@
               </div>
 
               <div class="field--full form-actions">
-                <button class="btn btn-primary" type="submit" data-submit>
+                <button class="btn btn-primary" type="submit">
                   <span>Lacak pesanan</span> <svg class="icon icon-arrow"><use href="#i-arrow-right" /></svg>
                 </button>
                 <p class="demo-hint">
@@ -436,7 +436,7 @@
               </div>
 
               <div class="field--full form-actions">
-                <button class="btn btn-primary" type="submit" data-submit>
+                <button class="btn btn-primary" type="submit">
                   <span>Kirim pengajuan</span> <svg class="icon icon-arrow"><use href="#i-arrow-right" /></svg>
                 </button>
                 <p class="demo-hint">
@@ -616,7 +616,7 @@
             <label for="nl-email" class="sr-only">Alamat email</label>
             <input id="nl-email" type="email" name="email" placeholder="email@kamu.com" autocomplete="email" required aria-describedby="nl-msg">
           </div>
-          <button class="btn btn-primary" type="submit" data-newsletter-btn>Daftar</button>
+          <button class="btn btn-primary" type="submit"><span>Daftar</span></button>
           <p class="form-msg" id="nl-msg" data-newsletter-msg aria-live="polite"></p>
         </form>
       </div>
@@ -733,10 +733,8 @@
   <div class="toast-stack" data-toasts aria-live="polite" aria-atomic="false"></div>
 
 
-  <script src="./assets/js/illustrations.js"></script>
-  <script src="./assets/js/data.js"></script>
-  <script src="./assets/js/script.js"></script>
-  <script src="./assets/js/bantuan.js"></script>
+  <!-- hasil kompilasi TypeScript dari folder src/ (npm run build) -->
+  <script src="./assets/js/app.js"></script>
 
 </body>
 
