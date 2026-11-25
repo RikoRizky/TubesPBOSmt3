@@ -344,6 +344,123 @@
       color: #F59E0B;
       font-size: 0.95rem;
     }
+
+    /* SEARCH & FILTER TOOLBAR */
+    .filter-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: #F9FAFB;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+    .search-box {
+      position: relative;
+      flex: 1 1 240px;
+      min-width: 200px;
+    }
+    .search-icon {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+      display: inline-flex;
+      align-items: center;
+    }
+    .search-input {
+      width: 100%;
+      padding: 8px 32px 8px 34px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.875rem;
+      color: var(--text-main);
+      background: var(--surface);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.14);
+    }
+    .search-clear {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #E5E7EB;
+      color: var(--text-main);
+      border: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      font-size: 0.8rem;
+      line-height: 1;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .search-clear:hover {
+      background: #D1D5DB;
+    }
+    .search-clear.visible {
+      display: inline-flex;
+    }
+    .filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    .filter-select {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .filter-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.14);
+    }
+    .btn-reset-filter {
+      padding: 8px 12px;
+      font-size: 0.83rem;
+      border-radius: 8px;
+    }
+    .btn-reset-filter:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .filter-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .empty-state-cell {
+      text-align: center;
+      padding: 28px 16px !important;
+      color: var(--text-muted);
+    }
+    .empty-state-cell p {
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 
@@ -448,6 +565,32 @@
           <h2 class="card-title">Transaksi Penjualan Terbaru</h2>
           <button class="btn btn-outline btn-sm" onclick="loadSummary()">Refresh Data</button>
         </div>
+        <div class="filter-toolbar" aria-label="Pencarian dan filter transaksi terbaru">
+          <div class="search-box">
+            <span class="search-icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </span>
+            <input type="text" id="summary-search" class="search-input" placeholder="Cari No. Pesanan, penerima, kurir, atau metode..." autocomplete="off">
+            <button type="button" class="search-clear" data-clear-for="summary-search" aria-label="Hapus pencarian">×</button>
+          </div>
+          <div class="filter-group">
+            <select id="summary-status-filter" class="filter-select" aria-label="Filter status transaksi">
+              <option value="all">Semua Status</option>
+              <option value="dibuat">Dibuat</option>
+              <option value="dibayar">Dibayar</option>
+              <option value="dikemas">Dikemas</option>
+              <option value="dikirim">Dikirim</option>
+              <option value="sampai">Sampai</option>
+            </select>
+            <select id="summary-payment-filter" class="filter-select" aria-label="Filter metode pembayaran">
+              <option value="all">Semua Metode Bayar</option>
+            </select>
+            <button type="button" id="summary-reset-btn" class="btn btn-outline btn-reset-filter" onclick="resetTabFilters('summary')" disabled>Reset</button>
+          </div>
+        </div>
+        <div class="filter-meta">
+          <span id="summary-filter-count">Menampilkan 0 transaksi</span>
+        </div>
         <div class="table-responsive">
           <table class="data-table">
             <thead>
@@ -477,6 +620,42 @@
             <p style="font-size:0.85rem; color:var(--text-muted); margin-top:2px;">Ubah stok barang secara langsung; perubahan akan langsung terupdate di database SQLite C#.</p>
           </div>
           <button class="btn btn-outline btn-sm" onclick="loadInventory()">Refresh Stok</button>
+        </div>
+        <div class="filter-toolbar" aria-label="Pencarian dan filter inventaris">
+          <div class="search-box">
+            <span class="search-icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </span>
+            <input type="text" id="inventory-search" class="search-input" placeholder="Cari ID atau nama produk..." autocomplete="off">
+            <button type="button" class="search-clear" data-clear-for="inventory-search" aria-label="Hapus pencarian">×</button>
+          </div>
+          <div class="filter-group">
+            <select id="inventory-category-filter" class="filter-select" aria-label="Filter kategori produk">
+              <option value="all">Semua Kategori</option>
+              <option value="makanan">Makanan</option>
+              <option value="camilan">Camilan</option>
+              <option value="mainan">Mainan</option>
+              <option value="perlengkapan">Perlengkapan</option>
+            </select>
+            <select id="inventory-stock-filter" class="filter-select" aria-label="Filter status stok">
+              <option value="all">Semua Status Stok</option>
+              <option value="low">Stok Kritis (≤ 10)</option>
+              <option value="empty">Stok Habis (0)</option>
+              <option value="safe">Stok Aman (&gt; 10)</option>
+            </select>
+            <select id="inventory-sort" class="filter-select" aria-label="Urutkan produk">
+              <option value="default">Urutan Default</option>
+              <option value="name-asc">Nama (A–Z)</option>
+              <option value="stock-asc">Stok Terendah</option>
+              <option value="stock-desc">Stok Tertinggi</option>
+              <option value="price-asc">Harga Termurah</option>
+              <option value="price-desc">Harga Termahal</option>
+            </select>
+            <button type="button" id="inventory-reset-btn" class="btn btn-outline btn-reset-filter" onclick="resetTabFilters('inventory')" disabled>Reset</button>
+          </div>
+        </div>
+        <div class="filter-meta">
+          <span id="inventory-filter-count">Menampilkan 0 produk</span>
         </div>
         <div class="table-responsive">
           <table class="data-table">
@@ -508,6 +687,41 @@
             <p style="font-size:0.85rem; color:var(--text-muted); margin-top:2px;">Pantau data pembeli, rincian belanja, alamat pengiriman, dan perbarui status pesanan.</p>
           </div>
           <button class="btn btn-outline btn-sm" onclick="loadOrders()">Refresh Pesanan</button>
+        </div>
+        <div class="filter-toolbar" aria-label="Pencarian dan filter pesanan">
+          <div class="search-box">
+            <span class="search-icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </span>
+            <input type="text" id="orders-search" class="search-input" placeholder="Cari No. Pesanan, nama, HP, email, alamat, resi, atau produk..." autocomplete="off">
+            <button type="button" class="search-clear" data-clear-for="orders-search" aria-label="Hapus pencarian">×</button>
+          </div>
+          <div class="filter-group">
+            <select id="orders-status-filter" class="filter-select" aria-label="Filter status pesanan">
+              <option value="all">Semua Status</option>
+              <option value="dibuat">Dibuat</option>
+              <option value="dibayar">Dibayar</option>
+              <option value="dikemas">Dikemas</option>
+              <option value="dikirim">Dikirim</option>
+              <option value="sampai">Sampai</option>
+            </select>
+            <select id="orders-payment-filter" class="filter-select" aria-label="Filter metode pembayaran pesanan">
+              <option value="all">Semua Pembayaran</option>
+            </select>
+            <select id="orders-courier-filter" class="filter-select" aria-label="Filter kurir pesanan">
+              <option value="all">Semua Kurir</option>
+            </select>
+            <select id="orders-sort" class="filter-select" aria-label="Urutkan pesanan">
+              <option value="newest">Terbaru</option>
+              <option value="oldest">Terlama</option>
+              <option value="total-desc">Total Tertinggi</option>
+              <option value="total-asc">Total Terendah</option>
+            </select>
+            <button type="button" id="orders-reset-btn" class="btn btn-outline btn-reset-filter" onclick="resetTabFilters('orders')" disabled>Reset</button>
+          </div>
+        </div>
+        <div class="filter-meta">
+          <span id="orders-filter-count">Menampilkan 0 pesanan</span>
         </div>
         <div class="table-responsive">
           <table class="data-table">
@@ -542,6 +756,46 @@
           </div>
           <button class="btn btn-outline btn-sm" onclick="loadReviews()">Refresh Ulasan</button>
         </div>
+        <div class="filter-toolbar" aria-label="Pencarian dan filter ulasan">
+          <div class="search-box">
+            <span class="search-icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </span>
+            <input type="text" id="reviews-search" class="search-input" placeholder="Cari pelanggan, nama produk, atau isi komentar..." autocomplete="off">
+            <button type="button" class="search-clear" data-clear-for="reviews-search" aria-label="Hapus pencarian">×</button>
+          </div>
+          <div class="filter-group">
+            <select id="reviews-product-rating-filter" class="filter-select" aria-label="Filter rating produk">
+              <option value="all">Semua Rating Produk</option>
+              <option value="5">Produk: 5 ★</option>
+              <option value="4">Produk: 4 ★</option>
+              <option value="3">Produk: 3 ★</option>
+              <option value="low">Produk: ≤ 2 ★</option>
+            </select>
+            <select id="reviews-service-rating-filter" class="filter-select" aria-label="Filter rating pelayanan">
+              <option value="all">Semua Rating Pelayanan</option>
+              <option value="5">Pelayanan: 5 ★</option>
+              <option value="4">Pelayanan: 4 ★</option>
+              <option value="3">Pelayanan: 3 ★</option>
+              <option value="low">Pelayanan: ≤ 2 ★</option>
+            </select>
+            <select id="reviews-comment-filter" class="filter-select" aria-label="Filter komentar ulasan">
+              <option value="all">Semua Ulasan</option>
+              <option value="with-comment">Dengan Komentar</option>
+              <option value="no-comment">Tanpa Komentar</option>
+            </select>
+            <select id="reviews-sort" class="filter-select" aria-label="Urutkan ulasan">
+              <option value="newest">Terbaru</option>
+              <option value="oldest">Terlama</option>
+              <option value="rating-desc">Rating Produk Tertinggi</option>
+              <option value="rating-asc">Rating Produk Terendah</option>
+            </select>
+            <button type="button" id="reviews-reset-btn" class="btn btn-outline btn-reset-filter" onclick="resetTabFilters('reviews')" disabled>Reset</button>
+          </div>
+        </div>
+        <div class="filter-meta">
+          <span id="reviews-filter-count">Menampilkan 0 ulasan</span>
+        </div>
         <div class="table-responsive">
           <table class="data-table">
             <thead>
@@ -567,6 +821,125 @@
 
   <script>
     const API_BASE = 'http://localhost:5000/api';
+
+    const adminData = {
+      summaryOrders: [],
+      inventory: [],
+      orders: [],
+      reviews: []
+    };
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function normalizeText(value) {
+      return String(value ?? '').toLowerCase().trim();
+    }
+
+    function matchesSearchQuery(fields, query) {
+      if (!query) return true;
+      return fields.some(f => normalizeText(f).includes(query));
+    }
+
+    function matchesRatingFilter(rating, filterValue) {
+      if (filterValue === 'all') return true;
+      if (filterValue === 'low') return rating <= 2;
+      return rating === Number(filterValue);
+    }
+
+    function syncDynamicSelectOptions(selectId, values, defaultLabel) {
+      const select = document.getElementById(selectId);
+      if (!select) return;
+      const current = select.value || 'all';
+      const uniqueValues = Array.from(new Set(values.filter(Boolean))).sort((a, b) => a.localeCompare(b, 'id'));
+      select.innerHTML = `<option value="all">${escapeHtml(defaultLabel)}</option>` +
+        uniqueValues.map(val => `<option value="${escapeHtml(val)}">${escapeHtml(val)}</option>`).join('');
+      select.value = uniqueValues.includes(current) ? current : 'all';
+    }
+
+    function updateClearButtonVisibility(input) {
+      const clearBtn = document.querySelector(`[data-clear-for="${input.id}"]`);
+      if (clearBtn) {
+        clearBtn.classList.toggle('visible', input.value.length > 0);
+      }
+    }
+
+    function renderEmptyFilterRow(colspan, tab, noun, isFiltered) {
+      if (!isFiltered) {
+        return `<tr><td colspan="${colspan}" class="empty-state-cell">Belum ada ${noun}.</td></tr>`;
+      }
+      return `
+        <tr>
+          <td colspan="${colspan}" class="empty-state-cell">
+            <p>Tidak ada ${noun} yang cocok dengan pencarian atau filter saat ini.</p>
+            <button type="button" class="btn btn-outline btn-sm" onclick="resetTabFilters('${tab}')">Reset Pencarian &amp; Filter</button>
+          </td>
+        </tr>
+      `;
+    }
+
+    const TAB_FILTER_DEFAULTS = {
+      summary: {
+        controls: { 'summary-search': '', 'summary-status-filter': 'all', 'summary-payment-filter': 'all' },
+        render: renderSummaryOrders
+      },
+      inventory: {
+        controls: { 'inventory-search': '', 'inventory-category-filter': 'all', 'inventory-stock-filter': 'all', 'inventory-sort': 'default' },
+        render: renderInventory
+      },
+      orders: {
+        controls: { 'orders-search': '', 'orders-status-filter': 'all', 'orders-payment-filter': 'all', 'orders-courier-filter': 'all', 'orders-sort': 'newest' },
+        render: renderOrders
+      },
+      reviews: {
+        controls: { 'reviews-search': '', 'reviews-product-rating-filter': 'all', 'reviews-service-rating-filter': 'all', 'reviews-comment-filter': 'all', 'reviews-sort': 'newest' },
+        render: renderReviews
+      }
+    };
+
+    function isTabFiltered(tab) {
+      const config = TAB_FILTER_DEFAULTS[tab];
+      if (!config) return false;
+      return Object.entries(config.controls).some(([id, defVal]) => {
+        const el = document.getElementById(id);
+        return el && el.value !== defVal;
+      });
+    }
+
+    function resetTabFilters(tab) {
+      const config = TAB_FILTER_DEFAULTS[tab];
+      if (!config) return;
+      Object.entries(config.controls).forEach(([id, defVal]) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.value = defVal;
+        if (el.classList.contains('search-input')) {
+          updateClearButtonVisibility(el);
+        }
+      });
+      config.render();
+    }
+
+    function updateFilterMeta(tab, countElId, resetBtnId, filteredLen, totalLen, noun) {
+      const countEl = document.getElementById(countElId);
+      const resetBtn = document.getElementById(resetBtnId);
+      const filtered = isTabFiltered(tab);
+      if (countEl) {
+        countEl.textContent = filtered
+          ? `Menampilkan ${filteredLen} dari ${totalLen} ${noun}`
+          : `Menampilkan ${totalLen} ${noun}`;
+      }
+      if (resetBtn) {
+        resetBtn.disabled = !filtered;
+      }
+      return filtered;
+    }
 
     // CEK SESI LOGIN ADMIN
     function checkAuth() {
@@ -666,7 +1039,46 @@
       });
     });
 
-    // 1. LOAD SUMMARY
+    // 1. LOAD & RENDER SUMMARY
+    function renderSummaryOrders() {
+      const query = normalizeText(document.getElementById('summary-search')?.value);
+      const statusFilter = document.getElementById('summary-status-filter')?.value || 'all';
+      const paymentFilter = document.getElementById('summary-payment-filter')?.value || 'all';
+
+      const filteredOrders = adminData.summaryOrders.filter(o => {
+        const payment = o.paymentMethod || 'QRIS';
+        if (statusFilter !== 'all' && o.status !== statusFilter) return false;
+        if (paymentFilter !== 'all' && payment !== paymentFilter) return false;
+        return matchesSearchQuery([o.id, o.customerName, o.courier, payment, o.status], query);
+      });
+
+      const isFiltered = updateFilterMeta(
+        'summary',
+        'summary-filter-count',
+        'summary-reset-btn',
+        filteredOrders.length,
+        adminData.summaryOrders.length,
+        'transaksi terbaru'
+      );
+
+      const tbody = document.getElementById('summary-orders-tbody');
+      if (filteredOrders.length === 0) {
+        tbody.innerHTML = renderEmptyFilterRow(6, 'summary', 'pesanan', isFiltered);
+        return;
+      }
+
+      tbody.innerHTML = filteredOrders.map(o => `
+        <tr>
+          <td><strong>${escapeHtml(o.id)}</strong></td>
+          <td><strong>${escapeHtml(o.customerName || '-')}</strong></td>
+          <td><span class="status-badge status-${escapeHtml(o.status)}">${escapeHtml(o.status)}</span></td>
+          <td><span style="font-weight:600; color:#4338CA;">${escapeHtml(o.paymentMethod || 'QRIS')}</span></td>
+          <td>${escapeHtml(o.courier)}</td>
+          <td><strong>${formatRupiah(o.total)}</strong></td>
+        </tr>
+      `).join('');
+    }
+
     async function loadSummary() {
       try {
         const res = await fetch(`${API_BASE}/admin/summary`);
@@ -680,57 +1092,92 @@
         document.getElementById('stat-rating').innerText = `${data.averageProductRating} ★`;
         document.getElementById('stat-service-rating').innerText = `${data.averageServiceRating} ★`;
 
-        const tbody = document.getElementById('summary-orders-tbody');
-        if (data.recentOrders.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Belum ada pesanan.</td></tr>';
-          return;
-        }
-
-        tbody.innerHTML = data.recentOrders.map(o => `
-          <tr>
-            <td><strong>${o.id}</strong></td>
-            <td><strong>${o.customerName || '-'}</strong></td>
-            <td><span class="status-badge status-${o.status}">${o.status}</span></td>
-            <td><span style="font-weight:600; color:#4338CA;">${o.paymentMethod || 'QRIS'}</span></td>
-            <td>${o.courier}</td>
-            <td><strong>${formatRupiah(o.total)}</strong></td>
-          </tr>
-        `).join('');
+        adminData.summaryOrders = data.recentOrders || [];
+        syncDynamicSelectOptions(
+          'summary-payment-filter',
+          adminData.summaryOrders.map(o => o.paymentMethod || 'QRIS'),
+          'Semua Metode Bayar'
+        );
+        renderSummaryOrders();
       } catch (err) {
         document.getElementById('api-status').innerText = '● Offline';
         document.getElementById('api-status').style.color = '#EF4444';
       }
     }
 
-    // 2. LOAD INVENTORY
+    // 2. LOAD & RENDER INVENTORY
+    function renderInventory() {
+      const query = normalizeText(document.getElementById('inventory-search')?.value);
+      const categoryFilter = document.getElementById('inventory-category-filter')?.value || 'all';
+      const stockFilter = document.getElementById('inventory-stock-filter')?.value || 'all';
+      const sortBy = document.getElementById('inventory-sort')?.value || 'default';
+
+      let filteredProducts = adminData.inventory.filter(p => {
+        if (categoryFilter !== 'all' && normalizeText(p.category) !== categoryFilter) return false;
+        if (stockFilter === 'low' && p.stock > 10) return false;
+        if (stockFilter === 'empty' && p.stock !== 0) return false;
+        if (stockFilter === 'safe' && p.stock <= 10) return false;
+        return matchesSearchQuery([p.id, p.name, p.category], query);
+      });
+
+      if (sortBy === 'name-asc') {
+        filteredProducts = [...filteredProducts].sort((a, b) => a.name.localeCompare(b.name, 'id'));
+      } else if (sortBy === 'stock-asc') {
+        filteredProducts = [...filteredProducts].sort((a, b) => a.stock - b.stock);
+      } else if (sortBy === 'stock-desc') {
+        filteredProducts = [...filteredProducts].sort((a, b) => b.stock - a.stock);
+      } else if (sortBy === 'price-asc') {
+        filteredProducts = [...filteredProducts].sort((a, b) => a.price - b.price);
+      } else if (sortBy === 'price-desc') {
+        filteredProducts = [...filteredProducts].sort((a, b) => b.price - a.price);
+      }
+
+      const isFiltered = updateFilterMeta(
+        'inventory',
+        'inventory-filter-count',
+        'inventory-reset-btn',
+        filteredProducts.length,
+        adminData.inventory.length,
+        'produk'
+      );
+
+      const tbody = document.getElementById('inventory-tbody');
+      if (filteredProducts.length === 0) {
+        tbody.innerHTML = renderEmptyFilterRow(7, 'inventory', 'produk', isFiltered);
+        return;
+      }
+
+      tbody.innerHTML = filteredProducts.map(p => {
+        const isLow = p.stock <= 10;
+        const safeId = escapeHtml(p.id);
+        return `
+          <tr>
+            <td><code>${safeId}</code></td>
+            <td><strong>${escapeHtml(p.name)}</strong></td>
+            <td><span style="text-transform:capitalize;">${escapeHtml(p.category)}</span></td>
+            <td>${formatRupiah(p.price)}</td>
+            <td>
+              <input type="number" id="stock-${safeId}" class="input-num" value="${p.stock}" min="0">
+            </td>
+            <td>
+              <span class="stock-badge ${isLow ? 'stock-low' : 'stock-safe'}">
+                ${isLow ? '⚠️ Stok Kritis (' + p.stock + ')' : '✓ Aman (' + p.stock + ')'}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-primary btn-sm" onclick="saveStock('${safeId}')">Simpan</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
     async function loadInventory() {
       try {
         const res = await fetch(`${API_BASE}/admin/inventory`);
-        const products = await res.json();
-        const tbody = document.getElementById('inventory-tbody');
-
-        tbody.innerHTML = products.map(p => {
-          const isLow = p.stock <= 10;
-          return `
-            <tr>
-              <td><code>${p.id}</code></td>
-              <td><strong>${p.name}</strong></td>
-              <td><span style="text-transform:capitalize;">${p.category}</span></td>
-              <td>${formatRupiah(p.price)}</td>
-              <td>
-                <input type="number" id="stock-${p.id}" class="input-num" value="${p.stock}" min="0">
-              </td>
-              <td>
-                <span class="stock-badge ${isLow ? 'stock-low' : 'stock-safe'}">
-                  ${isLow ? '⚠️ Stok Kritis (' + p.stock + ')' : '✓ Aman (' + p.stock + ')'}
-                </span>
-              </td>
-              <td>
-                <button class="btn btn-primary btn-sm" onclick="saveStock('${p.id}')">Simpan</button>
-              </td>
-            </tr>
-          `;
-        }).join('');
+        if (!res.ok) throw new Error('Gagal memuat inventaris');
+        adminData.inventory = await res.json();
+        renderInventory();
       } catch (err) {
         showToast('Gagal memuat inventaris: ' + err.message);
       }
@@ -760,57 +1207,111 @@
       }
     }
 
-    // 3. LOAD ORDERS
+    // 3. LOAD & RENDER ORDERS
+    function renderOrders() {
+      const query = normalizeText(document.getElementById('orders-search')?.value);
+      const statusFilter = document.getElementById('orders-status-filter')?.value || 'all';
+      const paymentFilter = document.getElementById('orders-payment-filter')?.value || 'all';
+      const courierFilter = document.getElementById('orders-courier-filter')?.value || 'all';
+      const sortBy = document.getElementById('orders-sort')?.value || 'newest';
+
+      let filteredOrders = adminData.orders.filter(o => {
+        const payment = o.paymentMethod || 'QRIS';
+        if (statusFilter !== 'all' && o.status !== statusFilter) return false;
+        if (paymentFilter !== 'all' && payment !== paymentFilter) return false;
+        if (courierFilter !== 'all' && o.courier !== courierFilter) return false;
+        const itemNames = (o.items || []).map(i => i.product ? i.product.name : i.productId).join(' ');
+        return matchesSearchQuery(
+          [o.id, o.customerName, o.phone, o.email, o.address, o.resi, o.courier, payment, o.notes, itemNames],
+          query
+        );
+      });
+
+      if (sortBy === 'oldest') {
+        filteredOrders = [...filteredOrders].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      } else if (sortBy === 'newest') {
+        filteredOrders = [...filteredOrders].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      } else if (sortBy === 'total-desc') {
+        filteredOrders = [...filteredOrders].sort((a, b) => b.total - a.total);
+      } else if (sortBy === 'total-asc') {
+        filteredOrders = [...filteredOrders].sort((a, b) => a.total - b.total);
+      }
+
+      const isFiltered = updateFilterMeta(
+        'orders',
+        'orders-filter-count',
+        'orders-reset-btn',
+        filteredOrders.length,
+        adminData.orders.length,
+        'pesanan'
+      );
+
+      const tbody = document.getElementById('orders-tbody');
+      if (filteredOrders.length === 0) {
+        tbody.innerHTML = renderEmptyFilterRow(9, 'orders', 'pesanan', isFiltered);
+        return;
+      }
+
+      tbody.innerHTML = filteredOrders.map(o => {
+        const safeId = escapeHtml(o.id);
+        const itemsSummary = (o.items || [])
+          .map(i => `${escapeHtml(i.product ? i.product.name : i.productId)} (${i.qty}×)`)
+          .join('<br>');
+        return `
+          <tr>
+            <td><strong>${safeId}</strong></td>
+            <td>
+              <strong>${escapeHtml(o.customerName || '-')}</strong><br>
+              <span style="font-size:0.75rem; color:#6B7280;">📞 ${escapeHtml(o.phone || '-')}</span><br>
+              <span style="font-size:0.75rem; color:#6B7280;">✉️ ${escapeHtml(o.email || '-')}</span>
+            </td>
+            <td style="max-width:200px; font-size:0.8rem;">
+              ${escapeHtml(o.address)}
+              ${o.notes ? `<br><em style="color:#F97316;">Catatan: ${escapeHtml(o.notes)}</em>` : ''}
+            </td>
+            <td style="font-size:0.8rem;">${itemsSummary}</td>
+            <td style="font-size:0.8rem;">
+              <span style="font-weight:700; color:#4338CA;">${escapeHtml(o.paymentMethod || 'QRIS')}</span><br>
+              <span style="color:#6B7280;">🚚 ${escapeHtml(o.courier)}</span>
+            </td>
+            <td><strong>${formatRupiah(o.total)}</strong></td>
+            <td><span class="status-badge status-${escapeHtml(o.status)}">${escapeHtml(o.status)}</span></td>
+            <td>
+              <input type="text" id="resi-${safeId}" value="${escapeHtml(o.resi || '')}" placeholder="No. Resi" style="width:110px; padding:4px 6px; font-size:0.8rem; border:1px solid var(--border); border-radius:4px;">
+            </td>
+            <td>
+              <div style="display:flex; gap:4px; align-items:center;">
+                <select id="status-${safeId}" class="select-status">
+                  <option value="dibuat" ${o.status === 'dibuat' ? 'selected' : ''}>Dibuat</option>
+                  <option value="dibayar" ${o.status === 'dibayar' ? 'selected' : ''}>Dibayar</option>
+                  <option value="dikemas" ${o.status === 'dikemas' ? 'selected' : ''}>Dikemas</option>
+                  <option value="dikirim" ${o.status === 'dikirim' ? 'selected' : ''}>Dikirim</option>
+                  <option value="sampai" ${o.status === 'sampai' ? 'selected' : ''}>Sampai</option>
+                </select>
+                <button class="btn btn-primary btn-sm" onclick="saveOrderStatus('${safeId}')">Update</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
     async function loadOrders() {
       try {
         const res = await fetch(`${API_BASE}/admin/orders`);
-        const orders = await res.json();
-        const tbody = document.getElementById('orders-tbody');
-
-        if (orders.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">Belum ada pesanan.</td></tr>';
-          return;
-        }
-
-        tbody.innerHTML = orders.map(o => {
-          const itemsSummary = o.items.map(i => `${i.product ? i.product.name : i.productId} (${i.qty}×)`).join('<br>');
-          return `
-            <tr>
-              <td><strong>${o.id}</strong></td>
-              <td>
-                <strong>${o.customerName || '-'}</strong><br>
-                <span style="font-size:0.75rem; color:#6B7280;">📞 ${o.phone || '-'}</span><br>
-                <span style="font-size:0.75rem; color:#6B7280;">✉️ ${o.email || '-'}</span>
-              </td>
-              <td style="max-width:200px; font-size:0.8rem;">
-                ${o.address}
-                ${o.notes ? `<br><em style="color:#F97316;">Catatan: ${o.notes}</em>` : ''}
-              </td>
-              <td style="font-size:0.8rem;">${itemsSummary}</td>
-              <td style="font-size:0.8rem;">
-                <span style="font-weight:700; color:#4338CA;">${o.paymentMethod || 'QRIS'}</span><br>
-                <span style="color:#6B7280;">🚚 ${o.courier}</span>
-              </td>
-              <td><strong>${formatRupiah(o.total)}</strong></td>
-              <td><span class="status-badge status-${o.status}">${o.status}</span></td>
-              <td>
-                <input type="text" id="resi-${o.id}" value="${o.resi || ''}" placeholder="No. Resi" style="width:110px; padding:4px 6px; font-size:0.8rem; border:1px solid var(--border); border-radius:4px;">
-              </td>
-              <td>
-                <div style="display:flex; gap:4px; align-items:center;">
-                  <select id="status-${o.id}" class="select-status">
-                    <option value="dibuat" ${o.status === 'dibuat' ? 'selected' : ''}>Dibuat</option>
-                    <option value="dibayar" ${o.status === 'dibayar' ? 'selected' : ''}>Dibayar</option>
-                    <option value="dikemas" ${o.status === 'dikemas' ? 'selected' : ''}>Dikemas</option>
-                    <option value="dikirim" ${o.status === 'dikirim' ? 'selected' : ''}>Dikirim</option>
-                    <option value="sampai" ${o.status === 'sampai' ? 'selected' : ''}>Sampai</option>
-                  </select>
-                  <button class="btn btn-primary btn-sm" onclick="saveOrderStatus('${o.id}')">Update</button>
-                </div>
-              </td>
-            </tr>
-          `;
-        }).join('');
+        if (!res.ok) throw new Error('Gagal memuat pesanan');
+        adminData.orders = await res.json();
+        syncDynamicSelectOptions(
+          'orders-payment-filter',
+          adminData.orders.map(o => o.paymentMethod || 'QRIS'),
+          'Semua Pembayaran'
+        );
+        syncDynamicSelectOptions(
+          'orders-courier-filter',
+          adminData.orders.map(o => o.courier),
+          'Semua Kurir'
+        );
+        renderOrders();
       } catch (err) {
         showToast('Gagal memuat pesanan: ' + err.message);
       }
@@ -837,32 +1338,100 @@
       }
     }
 
-    // 4. LOAD REVIEWS
+    // 4. LOAD & RENDER REVIEWS
+    function renderReviews() {
+      const query = normalizeText(document.getElementById('reviews-search')?.value);
+      const productRatingFilter = document.getElementById('reviews-product-rating-filter')?.value || 'all';
+      const serviceRatingFilter = document.getElementById('reviews-service-rating-filter')?.value || 'all';
+      const commentFilter = document.getElementById('reviews-comment-filter')?.value || 'all';
+      const sortBy = document.getElementById('reviews-sort')?.value || 'newest';
+
+      let filteredReviews = adminData.reviews.filter(r => {
+        if (!matchesRatingFilter(r.productRating, productRatingFilter)) return false;
+        if (!matchesRatingFilter(r.serviceRating, serviceRatingFilter)) return false;
+        const hasComment = Boolean(r.comment && r.comment.trim().length > 0);
+        if (commentFilter === 'with-comment' && !hasComment) return false;
+        if (commentFilter === 'no-comment' && hasComment) return false;
+        return matchesSearchQuery([r.customerName, r.productName, r.productId, r.orderId, r.comment], query);
+      });
+
+      if (sortBy === 'oldest') {
+        filteredReviews = [...filteredReviews].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      } else if (sortBy === 'newest') {
+        filteredReviews = [...filteredReviews].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      } else if (sortBy === 'rating-desc') {
+        filteredReviews = [...filteredReviews].sort((a, b) => b.productRating - a.productRating);
+      } else if (sortBy === 'rating-asc') {
+        filteredReviews = [...filteredReviews].sort((a, b) => a.productRating - b.productRating);
+      }
+
+      const isFiltered = updateFilterMeta(
+        'reviews',
+        'reviews-filter-count',
+        'reviews-reset-btn',
+        filteredReviews.length,
+        adminData.reviews.length,
+        'ulasan'
+      );
+
+      const tbody = document.getElementById('reviews-tbody');
+      if (filteredReviews.length === 0) {
+        tbody.innerHTML = renderEmptyFilterRow(6, 'reviews', 'review dari pelanggan', isFiltered);
+        return;
+      }
+
+      tbody.innerHTML = filteredReviews.map(r => `
+        <tr>
+          <td style="font-size:0.8rem; color:var(--text-muted);">${new Date(r.createdAt).toLocaleDateString('id-ID')}</td>
+          <td><strong>${escapeHtml(r.customerName)}</strong></td>
+          <td>${escapeHtml(r.productName || r.productId)}</td>
+          <td><span class="stars">${renderStars(r.productRating)}</span> (${r.productRating}/5)</td>
+          <td><span class="stars">${renderStars(r.serviceRating)}</span> (${r.serviceRating}/5)</td>
+          <td style="max-width:300px;">${r.comment ? `<em>"${escapeHtml(r.comment)}"</em>` : '<span style="color:var(--text-muted);">-</span>'}</td>
+        </tr>
+      `).join('');
+    }
+
     async function loadReviews() {
       try {
         const res = await fetch(`${API_BASE}/admin/reviews`);
-        const reviews = await res.json();
-        const tbody = document.getElementById('reviews-tbody');
-
-        if (reviews.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Belum ada review dari pelanggan.</td></tr>';
-          return;
-        }
-
-        tbody.innerHTML = reviews.map(r => `
-          <tr>
-            <td style="font-size:0.8rem; color:var(--text-muted);">${new Date(r.createdAt).toLocaleDateString('id-ID')}</td>
-            <td><strong>${r.customerName}</strong></td>
-            <td>${r.productName || r.productId}</td>
-            <td><span class="stars">${renderStars(r.productRating)}</span> (${r.productRating}/5)</td>
-            <td><span class="stars">${renderStars(r.serviceRating)}</span> (${r.serviceRating}/5)</td>
-            <td style="max-width:300px;">${r.comment ? `<em>"${r.comment}"</em>` : '<span style="color:var(--text-muted);">-</span>'}</td>
-          </tr>
-        `).join('');
+        if (!res.ok) throw new Error('Gagal memuat ulasan');
+        adminData.reviews = await res.json();
+        renderReviews();
       } catch (err) {
         showToast('Gagal memuat ulasan: ' + err.message);
       }
     }
+
+    // FILTER & SEARCH EVENT WIRING
+    function initFilterListeners() {
+      Object.values(TAB_FILTER_DEFAULTS).forEach(({ controls, render }) => {
+        Object.keys(controls).forEach(id => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          const eventName = el.tagName === 'INPUT' ? 'input' : 'change';
+          el.addEventListener(eventName, () => {
+            if (el.classList.contains('search-input')) {
+              updateClearButtonVisibility(el);
+            }
+            render();
+          });
+        });
+      });
+
+      document.querySelectorAll('.search-clear').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const input = document.getElementById(btn.dataset.clearFor);
+          if (!input) return;
+          input.value = '';
+          updateClearButtonVisibility(input);
+          input.dispatchEvent(new Event('input'));
+          input.focus();
+        });
+      });
+    }
+
+    initFilterListeners();
 
     // INITIAL LOAD
     if (checkAuth()) {
