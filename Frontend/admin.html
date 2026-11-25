@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — MeowPlace</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #F97316;
+      --primary-hover: #EA580C;
+      --primary-light: #FFEDD5;
+      --bg: #FDFBF7;
+      --surface: #FFFFFF;
+      --text-main: #2B1B12;
+      --text-muted: #6B7280;
+      --border: #E5E7EB;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 12px rgba(43,27,18,0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* TOPBAR */
+    .admin-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+    .header-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+    .brand-title {
+      font-family: 'Fredoka', cursive;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+    .brand-title span { color: var(--primary); }
+    .badge-admin {
+      background: #FEF3C7;
+      color: #92400E;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .btn-outline {
+      background: var(--surface);
+      border-color: var(--border);
+      color: var(--text-main);
+    }
+    .btn-outline:hover { background: #F3F4F6; }
+    .btn-primary {
+      background: var(--primary);
+      color: #FFF;
+    }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-sm { padding: 4px 10px; font-size: 0.8rem; }
+    .btn-danger { background: #FEE2E2; color: #DC2626; border-color: #FECACA; }
+    .btn-danger:hover { background: #FCA5A5; }
+
+    /* LOGIN SCREEN OVERLAY */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1.5rem;
+    }
+    .login-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.25rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 10px 25px rgba(43,27,18,0.08);
+      text-align: center;
+    }
+    .login-box h2 {
+      font-family: 'Fredoka', cursive;
+      margin: 12px 0 6px;
+      font-size: 1.6rem;
+    }
+    .login-box p.desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+    .login-form-group {
+      text-align: left;
+      margin-bottom: 14px;
+    }
+    .login-form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .login-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+    .login-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    /* LAYOUT & TABS */
+    .admin-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      width: 100%;
+      flex: 1;
+    }
+    .tabs-nav {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 2rem;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 10px 18px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: var(--primary); }
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    /* STATS GRID */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .stat-card p.label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    .stat-card h3.value {
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .stat-card span.meta {
+      font-size: 0.78rem;
+      margin-top: 4px;
+      display: block;
+      color: var(--text-muted);
+    }
+
+    /* CARD CONTAINER */
+    .content-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 2rem;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    /* TABLES */
+    .table-responsive {
+      overflow-x: auto;
+      width: 100%;
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+    table.data-table th {
+      background: #F9FAFB;
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    table.data-table td {
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    table.data-table tr:hover {
+      background-color: #FAFAF9;
+    }
+
+    /* STATUS BADGES */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+    .status-dibuat { background: #E0E7FF; color: #3730A3; }
+    .status-dibayar { background: #DBEAFE; color: #1E40AF; }
+    .status-dikemas { background: #FEF3C7; color: #92400E; }
+    .status-dikirim { background: #E0E7FF; color: #4338CA; }
+    .status-sampai { background: #D1FAE5; color: #065F46; }
+
+    .stock-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+    .stock-low { background: #FEE2E2; color: #B91C1C; }
+    .stock-safe { background: #ECFDF5; color: #047857; }
+
+    /* FORM ELEMENTS */
+    .input-num {
+      width: 80px;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-family: inherit;
+    }
+    .select-status {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      background: #FFF;
+    }
+
+    /* TOAST */
+    .toast-msg {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #2B1B12;
+      color: #FFF;
+      padding: 12px 20px;
+      border-radius: 10px;
+      box-shadow: var(--shadow-md);
+      font-size: 0.9rem;
+      z-index: 1000;
+      transition: opacity 0.3s;
+    }
+
+    /* STAR RATING */
+    .stars {
+      color: #F59E0B;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- LOGIN OVERLAY JIKA BELUM LOGIN -->
+  <div id="admin-login-screen" class="login-overlay" style="display: none;">
+    <div class="login-box">
+      <svg viewBox="0 0 40 40" width="48" height="48" aria-hidden="true">
+        <path d="M8 15 6.5 4.5l8.5 6h10l8.5-6L32 15c1.6 2.2 2.5 4.6 2.5 7.2C34.5 30 28 35 20 35S5.5 30 5.5 22.2C5.5 19.6 6.4 17.2 8 15Z" fill="#F97316" />
+        <path d="M9.6 12.6 9 8.6l3.6 2.6ZM30.4 12.6l.6-4-3.6 2.6Z" fill="#FED7AA" />
+        <circle cx="14.5" cy="22" r="2.2" fill="#2B1B12" />
+        <circle cx="25.5" cy="22" r="2.2" fill="#2B1B12" />
+        <path d="M18.2 26.4h3.6L20 28.5Z" fill="#2B1B12" />
+      </svg>
+      <h2>Login Admin MeowPlace</h2>
+      <p class="desc">Akses terbatas hanya untuk pengelola sistem MeowPlace.</p>
+
+      <form onsubmit="handleDirectLogin(event)">
+        <div class="login-form-group">
+          <label for="page-login-user">Username</label>
+          <input type="text" id="page-login-user" class="login-input" placeholder="admin" required autocomplete="username">
+        </div>
+        <div class="login-form-group">
+          <label for="page-login-pass">Password</label>
+          <input type="password" id="page-login-pass" class="login-input" placeholder="••••••••" required autocomplete="current-password">
+          <small style="display:block; margin-top:4px; font-size:0.75rem; color:#888;">Default: <code>admin</code> / <code>admin123</code></small>
+        </div>
+        <div id="page-login-err" style="display:none; color:#DC2626; font-size:0.85rem; margin-bottom:12px; background:#FEE2E2; padding:8px; border-radius:6px;"></div>
+        <button type="submit" id="page-login-btn" class="btn btn-primary btn-block" style="width:100%; padding:10px; font-weight:700; margin-bottom:10px;">
+          Masuk ke Dashboard
+        </button>
+        <a href="index.html" class="btn btn-outline btn-block" style="width:100%; justify-content:center;">
+          ← Kembali ke Toko
+        </a>
+      </form>
+    </div>
+  </div>
+
+  <header class="admin-header">
+    <div class="header-container">
+      <div class="brand-wrap">
+        <svg viewBox="0 0 40 40" width="32" height="32" aria-hidden="true">
+          <path d="M8 15 6.5 4.5l8.5 6h10l8.5-6L32 15c1.6 2.2 2.5 4.6 2.5 7.2C34.5 30 28 35 20 35S5.5 30 5.5 22.2C5.5 19.6 6.4 17.2 8 15Z" fill="#F97316" />
+          <path d="M9.6 12.6 9 8.6l3.6 2.6ZM30.4 12.6l.6-4-3.6 2.6Z" fill="#FED7AA" />
+          <circle cx="14.5" cy="22" r="2.2" fill="#2B1B12" />
+          <circle cx="25.5" cy="22" r="2.2" fill="#2B1B12" />
+          <path d="M18.2 26.4h3.6L20 28.5Z" fill="#2B1B12" />
+        </svg>
+        <span class="brand-title">Meow<span>Place</span></span>
+        <span class="badge-admin">Admin Dashboard</span>
+      </div>
+      <div class="header-actions">
+        <span id="admin-user-display" style="font-size: 0.85rem; font-weight: 600;">👤 Admin</span>
+        <span id="api-status" style="font-size: 0.8rem; color: #10B981; font-weight: 600;">● Online</span>
+        <a href="index.html" class="btn btn-outline btn-sm">Lihat Toko ↗</a>
+        <button type="button" class="btn btn-danger btn-sm" onclick="handleLogout()">Keluar</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-container" id="admin-main-content">
+    <!-- TABS -->
+    <nav class="tabs-nav" aria-label="Navigasi Admin">
+      <button class="tab-btn active" data-tab="summary">📊 Laporan &amp; Ringkasan</button>
+      <button class="tab-btn" data-tab="inventory">📦 Kelola Stok Barang</button>
+      <button class="tab-btn" data-tab="orders">🚚 Manajemen Pesanan</button>
+      <button class="tab-btn" data-tab="reviews">⭐ Rating &amp; Review Pelanggan</button>
+    </nav>
+
+    <!-- TAB 1: SUMMARY & LAPORAN PENJUALAN -->
+    <section id="tab-summary" class="tab-content">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <p class="label">Total Omzet Penjualan</p>
+          <h3 class="value" id="stat-revenue">Rp0</h3>
+          <span class="meta">Pesanan terverifikasi sistem</span>
+        </div>
+        <div class="stat-card">
+          <p class="label">Total Pesanan Masuk</p>
+          <h3 class="value" id="stat-orders">0</h3>
+          <span class="meta">Seluruh riwayat transaksi</span>
+        </div>
+        <div class="stat-card">
+          <p class="label">Produk Terdaftar</p>
+          <h3 class="value" id="stat-products">0</h3>
+          <span class="meta"><span id="stat-low-stock" style="color:var(--danger); font-weight:bold;">0</span> stok menipis</span>
+        </div>
+        <div class="stat-card">
+          <p class="label">Rata-rata Rating Kualitas</p>
+          <h3 class="value" id="stat-rating">5.0 ★</h3>
+          <span class="meta">Kepuasan makanan &amp; produk</span>
+        </div>
+        <div class="stat-card">
+          <p class="label">Rating Pelayanan</p>
+          <h3 class="value" id="stat-service-rating">5.0 ★</h3>
+          <span class="meta">Kepuasan kurir &amp; respon</span>
+        </div>
+      </div>
+
+      <div class="content-card">
+        <div class="card-header">
+          <h2 class="card-title">Transaksi Penjualan Terbaru</h2>
+          <button class="btn btn-outline btn-sm" onclick="loadSummary()">Refresh Data</button>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>No. Pesanan</th>
+                <th>Penerima</th>
+                <th>Status</th>
+                <th>Metode Bayar</th>
+                <th>Kurir</th>
+                <th>Total Belanja</th>
+              </tr>
+            </thead>
+            <tbody id="summary-orders-tbody">
+              <tr><td colspan="6" style="text-align:center;">Memuat data penjualan...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: INVENTARIS & STOK -->
+    <section id="tab-inventory" class="tab-content" style="display: none;">
+      <div class="content-card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Katalog &amp; Manajemen Stok Barang</h2>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-top:2px;">Ubah stok barang secara langsung; perubahan akan langsung terupdate di database SQLite C#.</p>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="loadInventory()">Refresh Stok</button>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nama Produk</th>
+                <th>Kategori</th>
+                <th>Harga Satuan</th>
+                <th>Stok Saat Ini</th>
+                <th>Status Stok</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-tbody">
+              <tr><td colspan="7" style="text-align:center;">Memuat inventaris produk...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: MANAJEMEN PESANAN -->
+    <section id="tab-orders" class="tab-content" style="display: none;">
+      <div class="content-card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Daftar Semua Pesanan Transaksi</h2>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-top:2px;">Pantau data pembeli, rincian belanja, alamat pengiriman, dan perbarui status pesanan.</p>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="loadOrders()">Refresh Pesanan</button>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>No. Pesanan</th>
+                <th>Penerima &amp; Kontak</th>
+                <th>Alamat Kirim</th>
+                <th>Barang Dipesan</th>
+                <th>Pembayaran</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>No. Resi</th>
+                <th>Aksi Status</th>
+              </tr>
+            </thead>
+            <tbody id="orders-tbody">
+              <tr><td colspan="9" style="text-align:center;">Memuat daftar pesanan...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: ULASAN & RATING -->
+    <section id="tab-reviews" class="tab-content" style="display: none;">
+      <div class="content-card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Review &amp; Penilaian Kepuasan Pelanggan</h2>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-top:2px;">Ulasan berdasarkan kualitas makanan/produk dan pelayanan pengiriman toko.</p>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="loadReviews()">Refresh Ulasan</button>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Pelanggan</th>
+                <th>Produk</th>
+                <th>Rating Produk</th>
+                <th>Rating Pelayanan</th>
+                <th>Ulasan / Komentar</th>
+              </tr>
+            </thead>
+            <tbody id="reviews-tbody">
+              <tr><td colspan="6" style="text-align:center;">Memuat ulasan...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast-msg" style="display: none;"></div>
+
+  <script>
+    const API_BASE = 'http://localhost:5000/api';
+
+    // CEK SESI LOGIN ADMIN
+    function checkAuth() {
+      const token = sessionStorage.getItem('meow_admin_token');
+      const user = sessionStorage.getItem('meow_admin_user');
+
+      if (!token) {
+        document.getElementById('admin-login-screen').style.display = 'flex';
+        document.getElementById('admin-main-content').style.display = 'none';
+        return false;
+      }
+
+      document.getElementById('admin-login-screen').style.display = 'none';
+      document.getElementById('admin-main-content').style.display = 'block';
+
+      if (user) {
+        try {
+          const parsed = JSON.parse(user);
+          document.getElementById('admin-user-display').innerText = `👤 ${parsed.fullName || parsed.username}`;
+        } catch {}
+      }
+      return true;
+    }
+
+    async function handleDirectLogin(e) {
+      e.preventDefault();
+      const errBox = document.getElementById('page-login-err');
+      const btn = document.getElementById('page-login-btn');
+      const username = document.getElementById('page-login-user').value.trim();
+      const password = document.getElementById('page-login-pass').value;
+
+      errBox.style.display = 'none';
+      btn.disabled = true;
+      btn.innerText = 'Memverifikasi…';
+
+      try {
+        const res = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || 'Username atau password salah.');
+        }
+
+        sessionStorage.setItem('meow_admin_token', data.token);
+        sessionStorage.setItem('meow_admin_user', JSON.stringify({ username: data.username, fullName: data.fullName }));
+
+        checkAuth();
+        loadSummary();
+      } catch (err) {
+        errBox.innerText = err.message;
+        errBox.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Masuk ke Dashboard';
+      }
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem('meow_admin_token');
+      sessionStorage.removeItem('meow_admin_user');
+      window.location.reload();
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerText = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 3000);
+    }
+
+    function formatRupiah(num) {
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
+    }
+
+    function renderStars(n) {
+      return '★'.repeat(n) + '☆'.repeat(Math.max(0, 5 - n));
+    }
+
+    // TAB SWITCHING
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+
+        btn.classList.add('active');
+        const tab = btn.dataset.tab;
+        document.getElementById(`tab-${tab}`).style.display = 'block';
+
+        if (tab === 'summary') loadSummary();
+        if (tab === 'inventory') loadInventory();
+        if (tab === 'orders') loadOrders();
+        if (tab === 'reviews') loadReviews();
+      });
+    });
+
+    // 1. LOAD SUMMARY
+    async function loadSummary() {
+      try {
+        const res = await fetch(`${API_BASE}/admin/summary`);
+        if (!res.ok) throw new Error('Gagal menghubungi API');
+        const data = await res.json();
+
+        document.getElementById('stat-revenue').innerText = formatRupiah(data.totalRevenue);
+        document.getElementById('stat-orders').innerText = data.totalOrders;
+        document.getElementById('stat-products').innerText = data.totalProducts;
+        document.getElementById('stat-low-stock').innerText = data.lowStockProductsCount;
+        document.getElementById('stat-rating').innerText = `${data.averageProductRating} ★`;
+        document.getElementById('stat-service-rating').innerText = `${data.averageServiceRating} ★`;
+
+        const tbody = document.getElementById('summary-orders-tbody');
+        if (data.recentOrders.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Belum ada pesanan.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = data.recentOrders.map(o => `
+          <tr>
+            <td><strong>${o.id}</strong></td>
+            <td><strong>${o.customerName || '-'}</strong></td>
+            <td><span class="status-badge status-${o.status}">${o.status}</span></td>
+            <td><span style="font-weight:600; color:#4338CA;">${o.paymentMethod || 'QRIS'}</span></td>
+            <td>${o.courier}</td>
+            <td><strong>${formatRupiah(o.total)}</strong></td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        document.getElementById('api-status').innerText = '● Offline';
+        document.getElementById('api-status').style.color = '#EF4444';
+      }
+    }
+
+    // 2. LOAD INVENTORY
+    async function loadInventory() {
+      try {
+        const res = await fetch(`${API_BASE}/admin/inventory`);
+        const products = await res.json();
+        const tbody = document.getElementById('inventory-tbody');
+
+        tbody.innerHTML = products.map(p => {
+          const isLow = p.stock <= 10;
+          return `
+            <tr>
+              <td><code>${p.id}</code></td>
+              <td><strong>${p.name}</strong></td>
+              <td><span style="text-transform:capitalize;">${p.category}</span></td>
+              <td>${formatRupiah(p.price)}</td>
+              <td>
+                <input type="number" id="stock-${p.id}" class="input-num" value="${p.stock}" min="0">
+              </td>
+              <td>
+                <span class="stock-badge ${isLow ? 'stock-low' : 'stock-safe'}">
+                  ${isLow ? '⚠️ Stok Kritis (' + p.stock + ')' : '✓ Aman (' + p.stock + ')'}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-primary btn-sm" onclick="saveStock('${p.id}')">Simpan</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        showToast('Gagal memuat inventaris: ' + err.message);
+      }
+    }
+
+    async function saveStock(id) {
+      const stockVal = parseInt(document.getElementById(`stock-${id}`).value, 10);
+      if (isNaN(stockVal) || stockVal < 0) {
+        alert('Jumlah stok tidak valid');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/admin/inventory/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ stock: stockVal })
+        });
+        if (res.ok) {
+          showToast(`Stok ${id} berhasil diperbarui menjadi ${stockVal}!`);
+          loadInventory();
+        } else {
+          showToast('Gagal memperbarui stok.');
+        }
+      } catch (err) {
+        showToast('Terjadi kesalahan: ' + err.message);
+      }
+    }
+
+    // 3. LOAD ORDERS
+    async function loadOrders() {
+      try {
+        const res = await fetch(`${API_BASE}/admin/orders`);
+        const orders = await res.json();
+        const tbody = document.getElementById('orders-tbody');
+
+        if (orders.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">Belum ada pesanan.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = orders.map(o => {
+          const itemsSummary = o.items.map(i => `${i.product ? i.product.name : i.productId} (${i.qty}×)`).join('<br>');
+          return `
+            <tr>
+              <td><strong>${o.id}</strong></td>
+              <td>
+                <strong>${o.customerName || '-'}</strong><br>
+                <span style="font-size:0.75rem; color:#6B7280;">📞 ${o.phone || '-'}</span><br>
+                <span style="font-size:0.75rem; color:#6B7280;">✉️ ${o.email || '-'}</span>
+              </td>
+              <td style="max-width:200px; font-size:0.8rem;">
+                ${o.address}
+                ${o.notes ? `<br><em style="color:#F97316;">Catatan: ${o.notes}</em>` : ''}
+              </td>
+              <td style="font-size:0.8rem;">${itemsSummary}</td>
+              <td style="font-size:0.8rem;">
+                <span style="font-weight:700; color:#4338CA;">${o.paymentMethod || 'QRIS'}</span><br>
+                <span style="color:#6B7280;">🚚 ${o.courier}</span>
+              </td>
+              <td><strong>${formatRupiah(o.total)}</strong></td>
+              <td><span class="status-badge status-${o.status}">${o.status}</span></td>
+              <td>
+                <input type="text" id="resi-${o.id}" value="${o.resi || ''}" placeholder="No. Resi" style="width:110px; padding:4px 6px; font-size:0.8rem; border:1px solid var(--border); border-radius:4px;">
+              </td>
+              <td>
+                <div style="display:flex; gap:4px; align-items:center;">
+                  <select id="status-${o.id}" class="select-status">
+                    <option value="dibuat" ${o.status === 'dibuat' ? 'selected' : ''}>Dibuat</option>
+                    <option value="dibayar" ${o.status === 'dibayar' ? 'selected' : ''}>Dibayar</option>
+                    <option value="dikemas" ${o.status === 'dikemas' ? 'selected' : ''}>Dikemas</option>
+                    <option value="dikirim" ${o.status === 'dikirim' ? 'selected' : ''}>Dikirim</option>
+                    <option value="sampai" ${o.status === 'sampai' ? 'selected' : ''}>Sampai</option>
+                  </select>
+                  <button class="btn btn-primary btn-sm" onclick="saveOrderStatus('${o.id}')">Update</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        showToast('Gagal memuat pesanan: ' + err.message);
+      }
+    }
+
+    async function saveOrderStatus(id) {
+      const statusVal = document.getElementById(`status-${id}`).value;
+      const resiVal = document.getElementById(`resi-${id}`).value;
+
+      try {
+        const res = await fetch(`${API_BASE}/admin/orders/${id}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: statusVal, resi: resiVal })
+        });
+        if (res.ok) {
+          showToast(`Status pesanan ${id} berhasil diubah ke ${statusVal}!`);
+          loadOrders();
+        } else {
+          showToast('Gagal memperbarui status pesanan.');
+        }
+      } catch (err) {
+        showToast('Terjadi kesalahan: ' + err.message);
+      }
+    }
+
+    // 4. LOAD REVIEWS
+    async function loadReviews() {
+      try {
+        const res = await fetch(`${API_BASE}/admin/reviews`);
+        const reviews = await res.json();
+        const tbody = document.getElementById('reviews-tbody');
+
+        if (reviews.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Belum ada review dari pelanggan.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = reviews.map(r => `
+          <tr>
+            <td style="font-size:0.8rem; color:var(--text-muted);">${new Date(r.createdAt).toLocaleDateString('id-ID')}</td>
+            <td><strong>${r.customerName}</strong></td>
+            <td>${r.productName || r.productId}</td>
+            <td><span class="stars">${renderStars(r.productRating)}</span> (${r.productRating}/5)</td>
+            <td><span class="stars">${renderStars(r.serviceRating)}</span> (${r.serviceRating}/5)</td>
+            <td style="max-width:300px;">${r.comment ? `<em>"${r.comment}"</em>` : '<span style="color:var(--text-muted);">-</span>'}</td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        showToast('Gagal memuat ulasan: ' + err.message);
+      }
+    }
+
+    // INITIAL LOAD
+    if (checkAuth()) {
+      loadSummary();
+    }
+  </script>
+</body>
+</html>

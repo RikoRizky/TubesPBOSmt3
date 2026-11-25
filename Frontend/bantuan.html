@@ -200,6 +200,13 @@
             </a>
           </li>
           <li data-reveal="up">
+            <a href="#penilaian" class="topic-card">
+              <span class="topic-icon"><svg class="icon"><use href="#i-star" /></svg></span>
+              <span class="topic-title">Penilaian &amp; Review</span>
+              <span class="topic-desc">Rating makanan &amp; pelayanan</span>
+            </a>
+          </li>
+          <li data-reveal="up">
             <a href="#pengembalian" class="topic-card">
               <span class="topic-icon"><svg class="icon"><use href="#i-return" /></svg></span>
               <span class="topic-title">Pengembalian</span>
@@ -238,6 +245,7 @@
         <ul class="help-nav-list" data-help-nav-list>
           <li><a href="#cara-belanja" class="help-nav-link" data-help-link><svg class="icon"><use href="#i-bag" /></svg> Cara belanja</a></li>
           <li><a href="#lacak-pesanan" class="help-nav-link" data-help-link><svg class="icon"><use href="#i-truck" /></svg> Lacak pesanan</a></li>
+          <li><a href="#penilaian" class="help-nav-link" data-help-link><svg class="icon"><use href="#i-star" /></svg> Penilaian &amp; Review</a></li>
           <li><a href="#pengembalian" class="help-nav-link" data-help-link><svg class="icon"><use href="#i-return" /></svg> Pengembalian</a></li>
           <li><a href="#faq" class="help-nav-link" data-help-link><svg class="icon"><use href="#i-help" /></svg> FAQ</a></li>
           <li><a href="#syarat-ketentuan" class="help-nav-link" data-help-link><svg class="icon"><use href="#i-doc" /></svg> Syarat &amp; ketentuan</a></li>
@@ -348,6 +356,107 @@
 
             <div class="form-alert" data-track-alert role="alert" hidden></div>
             <div class="track-result" data-track-result aria-live="polite" hidden></div>
+          </div>
+        </section>
+
+
+        <!-- ========== PENILAIAN & REVIEW PELANGGAN ========== -->
+        <section class="help-section" id="penilaian" aria-labelledby="rating-title">
+          <div class="help-section-head" data-reveal="up">
+            <p class="eyebrow">Kepuasan Pelanggan</p>
+            <h2 class="help-h2" id="rating-title">Beri Penilaian &amp; <span class="hl">Review Produk</span></h2>
+          </div>
+
+          <div class="help-card" data-reveal="up">
+            <div class="why-email">
+              <svg class="icon"><use href="#i-star" /></svg>
+              <p><strong>Ulasanmu sangat berharga!</strong> Kamu bisa menilai kualitas makanan/produk dan pelayanan pengiriman toko kami. Komentar ulasan bersifat <em>opsional</em> (bisa diisi atau dilewati).</p>
+            </div>
+
+            <form class="form-grid" id="customer-review-form" novalidate>
+              <div class="field">
+                <label for="review-order">Nomor Pesanan (opsional)</label>
+                <div class="input-wrap">
+                  <svg class="icon"><use href="#i-receipt" /></svg>
+                  <input id="review-order" name="orderId" placeholder="MP-261028" autocomplete="off">
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="review-product">Pilih Produk</label>
+                <div class="input-wrap">
+                  <select id="review-product" name="productId" required style="width:100%; height:48px; border:1.5px solid var(--border); border-radius:var(--radius-md); padding:0 14px; font-family:inherit; font-size:0.95rem; background:#FFF;">
+                    <option value="p01">Salmon Kitten Dry Food 1,5 kg</option>
+                    <option value="p02">Tuna Pâté in Gravy 85 g</option>
+                    <option value="p03">Chicken Crunch Treats 60 g</option>
+                    <option value="p04">Tikus Plush Isi Catnip</option>
+                    <option value="p05">Menara Garukan Sisal 60 cm</option>
+                    <option value="p06">Kasur Donat Fluffy</option>
+                    <option value="p07">Salmon Bites Dental 80 g</option>
+                    <option value="p08">Pasir Gumpal Lavender 10 L</option>
+                    <option value="p09">Adult Indoor Chicken 2 kg</option>
+                    <option value="p10">Tongkat Bulu Interaktif</option>
+                    <option value="p11">Air Mancur Minum 2 L</option>
+                    <option value="p12">Bola Benang Wol Isi 3</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="review-name">Nama Pelanggan</label>
+                <div class="input-wrap">
+                  <svg class="icon"><use href="#i-paw" /></svg>
+                  <input id="review-name" name="customerName" placeholder="Contoh: Riko Rizky" required>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="review-email">Email Kamu</label>
+                <div class="input-wrap">
+                  <svg class="icon"><use href="#i-mail" /></svg>
+                  <input id="review-email" type="email" name="email" placeholder="email@kamu.com" required>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="review-food-rating">Rating Kualitas Makanan / Produk</label>
+                <div class="input-wrap">
+                  <select id="review-food-rating" name="productRating" style="width:100%; height:48px; border:1.5px solid var(--border); border-radius:var(--radius-md); padding:0 14px; font-family:inherit; font-size:0.95rem; background:#FFF;">
+                    <option value="5">★★★★★ 5 - Sangat Bagus / Anabul Lahap</option>
+                    <option value="4">★★★★☆ 4 - Bagus</option>
+                    <option value="3">★★★☆☆ 3 - Cukup</option>
+                    <option value="2">★★☆☆☆ 2 - Kurang Cocok</option>
+                    <option value="1">★☆☆☆☆ 1 - Tidak Cocok</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="review-service-rating">Rating Pelayanan &amp; Kurir</label>
+                <div class="input-wrap">
+                  <select id="review-service-rating" name="serviceRating" style="width:100%; height:48px; border:1.5px solid var(--border); border-radius:var(--radius-md); padding:0 14px; font-family:inherit; font-size:0.95rem; background:#FFF;">
+                    <option value="5">★★★★★ 5 - Sangat Cepat &amp; Ramah</option>
+                    <option value="4">★★★★☆ 4 - Memuaskan</option>
+                    <option value="3">★★★☆☆ 3 - Standar</option>
+                    <option value="2">★★☆☆☆ 2 - Agak Lambat</option>
+                    <option value="1">★☆☆☆☆ 1 - Kurang Memuaskan</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field--full">
+                <label for="review-comment">Ulasan / Komentar (opsional)</label>
+                <textarea id="review-comment" name="comment" rows="3" placeholder="Ceritakan pengalaman anabul menikmati produk ini atau masukan untuk toko kami..." style="width:100%; border:1.5px solid var(--border); border-radius:var(--radius-md); padding:12px; font-family:inherit; font-size:0.95rem;"></textarea>
+              </div>
+
+              <div class="field--full form-actions">
+                <button class="btn btn-primary" type="submit" id="btn-submit-review">
+                  <span>Kirim Penilaian</span> <svg class="icon icon-arrow"><use href="#i-arrow-right" /></svg>
+                </button>
+              </div>
+            </form>
+
+            <div id="review-feedback" class="form-alert" role="alert" style="display:none; margin-top:1.25rem;"></div>
           </div>
         </section>
 
@@ -735,6 +844,91 @@
 
   <!-- hasil kompilasi TypeScript dari folder src/ (npm run build) -->
   <script src="./assets/js/app.js"></script>
+
+  <script>
+    const reviewForm = document.getElementById('customer-review-form');
+    if (reviewForm) {
+      reviewForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const feedback = document.getElementById('review-feedback');
+        const submitBtn = document.getElementById('btn-submit-review');
+
+        const data = {
+          orderId: document.getElementById('review-order').value || null,
+          productId: document.getElementById('review-product').value,
+          customerName: document.getElementById('review-name').value || 'Pelanggan MeowPlace',
+          email: document.getElementById('review-email').value,
+          productRating: parseInt(document.getElementById('review-food-rating').value, 10),
+          serviceRating: parseInt(document.getElementById('review-service-rating').value, 10),
+          comment: document.getElementById('review-comment').value || null
+        };
+
+        if (!data.email) {
+          feedback.style.display = 'block';
+          feedback.className = 'form-alert form-alert--error';
+          feedback.innerHTML = '<p>Email wajib diisi.</p>';
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>Mengirim…</span>';
+
+        try {
+          const res = await fetch('http://localhost:5000/api/reviews', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+
+          if (!res.ok) throw new Error('Gagal mengirim review.');
+          const resData = await res.json();
+
+          feedback.style.display = 'block';
+          feedback.className = 'form-alert form-alert--success';
+          feedback.innerHTML = `<p><strong>Terima kasih banyak!</strong> Penilaianmu untuk produk <em>${resData.productName || resData.productId}</em> telah tersimpan di sistem.</p>`;
+          reviewForm.reset();
+        } catch (err) {
+          feedback.style.display = 'block';
+          feedback.className = 'form-alert form-alert--error';
+          feedback.innerHTML = `<p>Gagal menyimpan penilaian. Pastikan Backend C# sudah aktif di port 5000.</p>`;
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>Kirim Penilaian</span> <svg class="icon icon-arrow"><use href="#i-arrow-right" /></svg>';
+        }
+      });
+    }
+
+    // Easter Egg: 5 Klik Logo Navbar untuk Akses Admin
+    let logoClicks = 0;
+    let logoTimer = null;
+    document.querySelectorAll('.logo').forEach(logo => {
+      logo.addEventListener('click', (e) => {
+        logoClicks++;
+        clearTimeout(logoTimer);
+        logoTimer = setTimeout(() => { logoClicks = 0; }, 2500);
+
+        if (logoClicks >= 5) {
+          e.preventDefault();
+          logoClicks = 0;
+          window.location.href = 'admin.html';
+        }
+      });
+    });
+
+    // Otomatis isi formulir lacak jika datang dari klik "Lacak Pesanan" di struk belanja
+    try {
+      const hashPart = window.location.hash.includes('?') ? window.location.hash.split('?')[1] : '';
+      const params = new URLSearchParams(window.location.search || hashPart);
+      const oId = params.get('order');
+      const oEmail = params.get('email');
+      if (oId && document.getElementById('track-order')) {
+        document.getElementById('track-order').value = oId;
+      }
+      if (oEmail && document.getElementById('track-email')) {
+        document.getElementById('track-email').value = oEmail;
+      }
+    } catch {}
+  </script>
 
 </body>
 

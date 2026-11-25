@@ -53,9 +53,33 @@ export class CartDrawer extends Layer {
       button.addEventListener('click', () => this.hide({ restoreFocus: false })),
     );
     this.list.addEventListener('click', (event) => this.handleListClick(event));
-    this.find('[data-checkout]')?.addEventListener('click', () =>
-      this.deps.notifier.notify('Checkout akan aktif setelah backend terhubung. Sabar ya, meong!', { duration: 3600 }),
-    );
+    this.find('[data-checkout]')?.addEventListener('click', () => {
+      if (this.deps.cart.lines.length === 0) {
+        this.deps.notifier.notify('Keranjang belanja masih kosong.', { type: 'error' });
+        return;
+      }
+
+      // Tutup drawer dan buka modal pengisian data alamat & pembayaran
+      this.hide({ restoreFocus: false });
+      window.dispatchEvent(new CustomEvent('meow:open-checkout', {
+        detail: {
+          items: this.deps.cart.lines.map((l) => ({
+            id: l.product.id,
+            name: l.product.name,
+            price: l.product.price,
+            qty: l.quantity,
+            total: l.total,
+          })),
+          subtotal: this.deps.cart.subtotal,
+        },
+      }));
+    });
+
+    // Dengarkan event ketika checkout berhasil dibayar
+    window.addEventListener('meow:cart-clear', () => {
+      this.deps.cart.clear();
+      this.render();
+    });
 
     // OBSERVER: setiap isi keranjang berubah, tampilan ikut diperbarui
     this.deps.cart.subscribe(() => this.render());

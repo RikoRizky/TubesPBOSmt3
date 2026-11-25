@@ -57,6 +57,11 @@ export class Cart extends Observable<Cart> {
     if (this.quantities.delete(productId)) this.commit();
   }
 
+  clear(): void {
+    this.quantities.clear();
+    this.commit();
+  }
+
   /* ---------- pertanyaan ---------- */
 
   quantityOf(productId: string): number {

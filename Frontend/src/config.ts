@@ -6,6 +6,6 @@ export interface AppConfig {
 }
 
 export const config: AppConfig = {
-  useApi: false,
+  useApi: true,
   apiBaseUrl: 'http://localhost:5000/api',
 };

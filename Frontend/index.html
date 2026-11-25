@@ -48,6 +48,7 @@
     <symbol id="i-instagram" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5" /><circle cx="12" cy="12" r="3.8" /><path d="M17 7v.01" /></symbol>
     <symbol id="i-tiktok" viewBox="0 0 24 24"><path d="M14 3.5v11a3.5 3.5 0 1 1-3.5-3.5" /><path d="M14 3.5c.5 2.6 2.4 4.5 5 4.6" /></symbol>
     <symbol id="i-youtube" viewBox="0 0 24 24"><rect x="2.5" y="5.5" width="19" height="13" rx="4" /><path d="m10 9.3 4.8 2.7-4.8 2.7V9.3Z" /></symbol>
+    <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z" /><path d="M9 8h6M9 12h6" /></symbol>
     <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19l-4 1Z" /></symbol>
     <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z" /><circle cx="12" cy="9.5" r="2.5" /></symbol>
     <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h3.5l2 5-2.4 1.5a11 11 0 0 0 5.4 5.4L15 13.5l5 2V19a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" /></symbol>
@@ -90,6 +91,8 @@
           <li><a href="#promo" class="navbar-link" data-nav-link>Promo</a></li>
           <li><a href="#belanja" class="navbar-link" data-nav-link>Belanja</a></li>
           <li><a href="#testimoni" class="navbar-link" data-nav-link>Testimoni</a></li>
+          <li><a href="bantuan.html" class="navbar-link">Bantuan &amp; Lacak</a></li>
+          <li><a href="#" class="navbar-link" onclick="openHistoryModal(event)">Riwayat Pesanan</a></li>
           <li class="nav-indicator" data-nav-indicator aria-hidden="true"></li>
         </ul>
 
@@ -112,6 +115,9 @@
         <button class="icon-btn" type="button" data-cart-open aria-label="Buka keranjang" aria-controls="keranjang">
           <svg class="icon"><use href="#i-bag" /></svg>
           <span class="count-badge" data-cart-count hidden>0</span>
+        </button>
+        <button class="icon-btn" type="button" onclick="openHistoryModal()" aria-label="Riwayat pesanan" title="Riwayat Pesanan">
+          <svg class="icon"><use href="#i-receipt" /></svg>
         </button>
         <button class="icon-btn nav-toggle" type="button" data-nav-open aria-label="Buka menu" aria-controls="navbar" aria-expanded="false">
           <svg class="icon"><use href="#i-menu" /></svg>
@@ -763,6 +769,814 @@
 
   <!-- hasil kompilasi TypeScript dari folder src/ (npm run build) -->
   <script src="./assets/js/app.js"></script>
+
+  <!-- ==================== MODAL CHECKOUT PENGIRIMAN & PEMBAYARAN ==================== -->
+  <div id="checkout-modal" class="custom-modal-backdrop" style="display:none;">
+    <div class="custom-modal-card">
+      <div class="modal-header">
+        <h3>📦 Formulir Pengiriman &amp; Pembayaran</h3>
+        <button type="button" class="modal-close-btn" onclick="closeCheckoutModal()">✕</button>
+      </div>
+      <form id="real-checkout-form" class="modal-body" onsubmit="handleRealCheckout(event)">
+        <div class="checkout-grid">
+          <div class="checkout-form-col">
+            <h4 style="margin-bottom:12px; color:var(--primary); font-size:0.95rem; font-weight:700;">1. Data Penerima Paket</h4>
+            <div class="form-group">
+              <label for="co-name">Nama Lengkap Penerima *</label>
+              <input type="text" id="co-name" placeholder="Contoh: Riko Rizky" required class="modal-input">
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="co-phone">Nomor WhatsApp / HP *</label>
+                <input type="tel" id="co-phone" placeholder="081234567890" required class="modal-input">
+              </div>
+              <div class="form-group">
+                <label for="co-email">Email Notifikasi *</label>
+                <input type="email" id="co-email" placeholder="nama@email.com" required class="modal-input">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="co-address">Alamat Lengkap Pengiriman *</label>
+              <textarea id="co-address" rows="3" placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan, kecamatan, kota/kabupaten, kode pos" required class="modal-input"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="co-notes">Catatan Kurir (opsional)</label>
+              <input type="text" id="co-notes" placeholder="Contoh: Titipkan di satpam / pagar hitam" class="modal-input">
+            </div>
+
+            <h4 style="margin:16px 0 12px; color:var(--primary); font-size:0.95rem; font-weight:700;">2. Ekspedisi &amp; Pembayaran</h4>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="co-courier">Pilihan Kurir *</label>
+                <select id="co-courier" class="modal-input" onchange="updateCheckoutTotals()">
+                  <option value="Kurir MeowPlace (Same Day)">Kurir MeowPlace (Same Day) - Rekomendasi</option>
+                  <option value="SiCepat BEST">SiCepat BEST (1-2 hari)</option>
+                  <option value="JNE REG">JNE REG (2-3 hari)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="co-payment">Metode Pembayaran *</label>
+                <select id="co-payment" class="modal-input">
+                  <option value="QRIS">QRIS (GoPay, OVO, Dana, BCA Mobile)</option>
+                  <option value="Transfer BCA">Transfer Bank BCA</option>
+                  <option value="Transfer Mandiri">Transfer Bank Mandiri</option>
+                  <option value="COD">COD (Bayar Tunai di Tempat)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="checkout-summary-col">
+            <h4 style="margin-bottom:12px; color:var(--text-main); font-size:0.95rem; font-weight:700;">Ringkasan Pesanan</h4>
+            <div id="co-items-list" class="summary-items-list">
+              <!-- Rendered dynamically -->
+            </div>
+            <div class="summary-cost-box">
+              <div class="cost-row"><span>Subtotal Produk</span><span id="co-subtotal-text">Rp0</span></div>
+              <div class="cost-row"><span>Biaya Pengiriman</span><span id="co-shipping-text">Rp0</span></div>
+              <div class="cost-divider"></div>
+              <div class="cost-row total-row"><span>Total Pembayaran</span><strong id="co-total-text">Rp0</strong></div>
+            </div>
+            <button type="submit" id="co-submit-btn" class="btn btn-primary btn-block" style="margin-top:16px; padding:12px; font-size:1rem; border-radius:10px;">
+              Bayar Sekarang &amp; Konfirmasi
+            </button>
+            <p id="co-error-alert" class="modal-error-alert" style="display:none;"></p>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL RIWAYAT PESANAN ==================== -->
+  <div id="history-modal" class="custom-modal-backdrop" style="display:none;">
+    <div class="custom-modal-card" style="max-width: 680px;">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <svg class="icon" style="width:22px; height:22px; color:var(--primary);"><use href="#i-receipt" /></svg>
+          <h3 style="font-size:1.15rem; font-weight:700;">Riwayat Pesanan Saya</h3>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeHistoryModal()">✕</button>
+      </div>
+
+      <div class="modal-body" style="padding:1.25rem 1.5rem;">
+        <p style="font-size:0.85rem; color:var(--text-muted); margin:0 0 14px;">
+          Daftar pesanan yang pernah kamu checkout di MeowPlace. Kamu bisa melihat ulang struk pembelian, melacak status paket, atau memberi review.
+        </p>
+
+        <!-- Search by Email bar -->
+        <div style="display:flex; gap:8px; margin-bottom:1.25rem;">
+          <input type="email" id="hist-email-input" placeholder="Masukkan email saat checkout..." class="modal-input" style="flex:1;">
+          <button type="button" class="btn btn-primary btn-sm" onclick="searchHistoryByEmail()" style="white-space:nowrap; padding:8px 16px;">
+            Cari Pesanan
+          </button>
+        </div>
+
+        <!-- Orders container -->
+        <div id="history-orders-container" style="max-height: 480px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL STRUK TRANSAKSI RESMI ==================== -->
+  <div id="receipt-modal" class="custom-modal-backdrop" style="display:none;">
+    <div class="custom-modal-card receipt-card">
+      <div id="receipt-printable-area" class="receipt-content">
+        <div class="receipt-header">
+          <div class="receipt-brand">
+            <svg viewBox="0 0 40 40" width="36" height="36" aria-hidden="true">
+              <path d="M8 15 6.5 4.5l8.5 6h10l8.5-6L32 15c1.6 2.2 2.5 4.6 2.5 7.2C34.5 30 28 35 20 35S5.5 30 5.5 22.2C5.5 19.6 6.4 17.2 8 15Z" fill="#F97316" />
+              <path d="M9.6 12.6 9 8.6l3.6 2.6ZM30.4 12.6l.6-4-3.6 2.6Z" fill="#FED7AA" />
+              <circle cx="14.5" cy="22" r="2.2" fill="#2B1B12" />
+              <circle cx="25.5" cy="22" r="2.2" fill="#2B1B12" />
+              <path d="M18.2 26.4h3.6L20 28.5Z" fill="#2B1B12" />
+            </svg>
+            <h2>MeowPlace Petshop</h2>
+          </div>
+          <p class="receipt-subtitle">Bukti Pembelian Resmi — Terverifikasi Sistem</p>
+          <div class="receipt-status-badge">✓ PEMBAYARAN LUNAS</div>
+        </div>
+
+        <div class="receipt-dashed"></div>
+
+        <div class="receipt-meta-grid">
+          <div><span class="lbl">No. Transaksi</span><strong id="rec-order-id" class="hl-id">-</strong></div>
+          <div><span class="lbl">Waktu Pembelian</span><span id="rec-datetime">-</span></div>
+          <div><span class="lbl">Nama Penerima</span><strong id="rec-customer-name">-</strong></div>
+          <div><span class="lbl">Nomor HP/WA</span><span id="rec-phone">-</span></div>
+          <div><span class="lbl">Kurir Pengiriman</span><span id="rec-courier">-</span></div>
+          <div><span class="lbl">Metode Bayar</span><strong id="rec-payment-method">-</strong></div>
+          <div style="grid-column: span 2;"><span class="lbl">Alamat Pengiriman</span><span id="rec-address">-</span></div>
+        </div>
+
+        <div class="receipt-dashed"></div>
+
+        <div class="receipt-items-table">
+          <div class="rec-th">
+            <span>Item &amp; Qty</span>
+            <span style="text-align:right;">Subtotal</span>
+          </div>
+          <div id="rec-items-body" class="rec-tbody"></div>
+        </div>
+
+        <div class="receipt-dashed"></div>
+
+        <div class="receipt-totals">
+          <div class="rec-row"><span>Subtotal Barang:</span><span id="rec-subtotal">Rp0</span></div>
+          <div class="rec-row"><span>Ongkos Kirim:</span><span id="rec-shipping">Rp0</span></div>
+          <div class="rec-row grand-total"><span>TOTAL DIBAYAR:</span><strong id="rec-total">Rp0</strong></div>
+        </div>
+
+        <div class="receipt-dashed"></div>
+
+        <div class="receipt-footer-notes">
+          <p>🐾 Terima kasih sudah belanja di MeowPlace! Pesananmu langsung masuk ke sistem admin dan segera dikemas.</p>
+          <p style="margin-top:6px; font-size:0.75rem; color:#888;">Simpan nomor pesanan ini untuk melacak paketmu di Pusat Bantuan.</p>
+        </div>
+      </div>
+
+      <div class="receipt-actions-footer">
+        <button type="button" class="btn btn-outline btn-sm" onclick="printReceipt()">🖨️ Cetak / Unduh Struk</button>
+        <button type="button" class="btn btn-outline btn-sm" onclick="trackThisReceipt()">🚚 Lacak Pesanan</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="closeReceiptModal()">Selesai &amp; Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL LOGIN ADMIN RAHASIA (5 KLIK LOGO) ==================== -->
+  <div id="admin-login-modal" class="custom-modal-backdrop" style="display:none;">
+    <div class="custom-modal-card admin-login-card">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.4rem;">🔐</span>
+          <h3 style="font-size:1.15rem; font-weight:700;">Akses Administrator</h3>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeAdminLoginModal()">✕</button>
+      </div>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin: 0 0 16px;">
+        Kamu mengakses pintu khusus admin MeowPlace. Masukkan username &amp; password yang terdaftar di database.
+      </p>
+      <form id="secret-admin-login-form" onsubmit="handleAdminLogin(event)">
+        <div class="form-group" style="margin-bottom:12px;">
+          <label for="adm-username" style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Username Admin</label>
+          <input type="text" id="adm-username" placeholder="admin" required class="modal-input" autocomplete="username">
+        </div>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label for="adm-password" style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Password</label>
+          <input type="password" id="adm-password" placeholder="••••••••" required class="modal-input" autocomplete="current-password">
+          <small style="display:block; margin-top:4px; font-size:0.75rem; color:#888;">Default awal: <code>admin</code> / <code>admin123</code></small>
+        </div>
+        <div id="adm-login-alert" class="modal-error-alert" style="display:none; margin-bottom:12px;"></div>
+        <button type="submit" id="adm-submit-btn" class="btn btn-primary btn-block" style="padding:10px; font-weight:700;">
+          Masuk ke Dashboard Admin
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <style>
+    /* MODAL BASE */
+    .custom-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(43, 27, 18, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      animation: modalFadeIn 0.25s ease-out;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .custom-modal-card {
+      background: #FFFFFF;
+      border-radius: 18px;
+      width: 100%;
+      max-width: 820px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(43, 27, 18, 0.2);
+      display: flex;
+      flex-direction: column;
+    }
+    .admin-login-card { max-width: 400px; padding: 1.75rem; }
+    .receipt-card { max-width: 500px; }
+
+    .modal-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #E5E7EB;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h3 { font-size: 1.15rem; font-weight: 700; color: #2B1B12; margin: 0; }
+    .modal-close-btn {
+      background: #F3F4F6;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #4B5563;
+      transition: background 0.2s;
+    }
+    .modal-close-btn:hover { background: #E5E7EB; }
+
+    .modal-body { padding: 1.5rem; }
+    .checkout-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 768px) {
+      .checkout-grid { grid-template-columns: 1fr; }
+    }
+
+    .form-group { margin-bottom: 12px; }
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 4px;
+    }
+    .modal-input {
+      width: 100%;
+      border: 1.5px solid #D1D5DB;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      transition: border-color 0.2s;
+      background: #FFFFFF;
+    }
+    .modal-input:focus {
+      outline: none;
+      border-color: #F97316;
+    }
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* SUMMARY COL */
+    .checkout-summary-col {
+      background: #FDFBF7;
+      border: 1px solid #FED7AA;
+      border-radius: 12px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .summary-items-list {
+      max-height: 200px;
+      overflow-y: auto;
+      margin-bottom: 12px;
+    }
+    .summary-item-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      padding: 6px 0;
+      border-bottom: 1px dashed #E5E7EB;
+    }
+    .summary-cost-box {
+      margin-top: auto;
+      padding-top: 10px;
+    }
+    .cost-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+      color: #4B5563;
+    }
+    .cost-divider {
+      height: 1px;
+      background: #E5E7EB;
+      margin: 8px 0;
+    }
+    .total-row {
+      font-size: 1.05rem;
+      color: #2B1B12;
+      font-weight: 700;
+    }
+    .modal-error-alert {
+      background: #FEE2E2;
+      color: #B91C1C;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      margin-top: 10px;
+    }
+
+    /* RECEIPT STYLING */
+    .receipt-content {
+      padding: 1.75rem 1.75rem 1rem;
+      background: #FFF;
+      color: #2B1B12;
+      font-family: 'Plus Jakarta Sans', monospace, sans-serif;
+    }
+    .receipt-header { text-align: center; margin-bottom: 14px; }
+    .receipt-brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .receipt-brand h2 {
+      font-family: 'Fredoka', cursive;
+      font-size: 1.35rem;
+      margin: 0;
+      color: #2B1B12;
+    }
+    .receipt-subtitle { font-size: 0.78rem; color: #6B7280; margin: 2px 0 8px; }
+    .receipt-status-badge {
+      display: inline-block;
+      background: #D1FAE5;
+      color: #065F46;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.5px;
+    }
+    .receipt-dashed {
+      border-bottom: 1.5px dashed #CBD5E1;
+      margin: 12px 0;
+    }
+    .receipt-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 0.8rem;
+    }
+    .receipt-meta-grid .lbl {
+      display: block;
+      color: #6B7280;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+    }
+    .receipt-meta-grid .hl-id { color: #F97316; font-size: 0.95rem; }
+
+    .receipt-items-table { font-size: 0.85rem; }
+    .rec-th {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      color: #4B5563;
+      margin-bottom: 6px;
+      font-size: 0.8rem;
+    }
+    .rec-item-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+    }
+    .rec-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      margin-bottom: 4px;
+      color: #4B5563;
+    }
+    .grand-total {
+      font-size: 1.05rem;
+      color: #2B1B12;
+      font-weight: 800;
+      margin-top: 6px;
+    }
+    .receipt-footer-notes {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #4B5563;
+      padding: 4px 0;
+    }
+    .receipt-actions-footer {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      padding: 1rem 1.75rem;
+      background: #F9FAFB;
+      border-top: 1px solid #E5E7EB;
+      border-radius: 0 0 18px 18px;
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #receipt-printable-area, #receipt-printable-area * { visibility: visible; }
+      #receipt-printable-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 0;
+      }
+    }
+  </style>
+
+  <script>
+    const API_ROOT = 'http://localhost:5000/api';
+    let currentCheckoutData = { items: [], subtotal: 0 };
+    let latestCreatedOrder = null;
+
+    // 1. EASTER EGG: 5 KLIK LOGO UNTUK AKSES ADMIN
+    let logoClickCount = 0;
+    let logoTimer = null;
+    document.querySelectorAll('.logo').forEach(logo => {
+      logo.addEventListener('click', (e) => {
+        logoClickCount++;
+        clearTimeout(logoTimer);
+        logoTimer = setTimeout(() => { logoClickCount = 0; }, 2500);
+
+        if (logoClickCount >= 5) {
+          e.preventDefault();
+          logoClickCount = 0;
+          openAdminLoginModal();
+        }
+      });
+    });
+
+    function openAdminLoginModal() {
+      const modal = document.getElementById('admin-login-modal');
+      modal.style.display = 'flex';
+      document.getElementById('adm-username').focus();
+    }
+    function closeAdminLoginModal() {
+      document.getElementById('admin-login-modal').style.display = 'none';
+    }
+
+    async function handleAdminLogin(e) {
+      e.preventDefault();
+      const alertBox = document.getElementById('adm-login-alert');
+      const submitBtn = document.getElementById('adm-submit-btn');
+      const username = document.getElementById('adm-username').value.trim();
+      const password = document.getElementById('adm-password').value;
+
+      alertBox.style.display = 'none';
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Memverifikasi…';
+
+      try {
+        const res = await fetch(`${API_ROOT}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || 'Username atau password salah.');
+        }
+
+        // Simpan sesi admin
+        sessionStorage.setItem('meow_admin_token', data.token);
+        sessionStorage.setItem('meow_admin_user', JSON.stringify({ username: data.username, fullName: data.fullName }));
+
+        // Arahkan ke dashboard admin
+        window.location.href = 'admin.html';
+      } catch (err) {
+        alertBox.innerText = err.message;
+        alertBox.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Masuk ke Dashboard Admin';
+      }
+    }
+
+    // 2. CHECKOUT DENGAN DATA PEMBELI
+    window.addEventListener('meow:open-checkout', (e) => {
+      currentCheckoutData = e.detail;
+      openCheckoutModal();
+    });
+
+    function formatRupiah(num) {
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
+    }
+
+    function openCheckoutModal() {
+      const modal = document.getElementById('checkout-modal');
+      const itemsList = document.getElementById('co-items-list');
+
+      itemsList.innerHTML = currentCheckoutData.items.map(item => `
+        <div class="summary-item-row">
+          <div>
+            <strong>${item.name}</strong><br>
+            <span style="color:#6B7280; font-size:0.75rem;">${item.qty} × ${formatRupiah(item.price)}</span>
+          </div>
+          <strong>${formatRupiah(item.total)}</strong>
+        </div>
+      `).join('');
+
+      updateCheckoutTotals();
+      modal.style.display = 'flex';
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('checkout-modal').style.display = 'none';
+    }
+
+    function updateCheckoutTotals() {
+      const subtotal = currentCheckoutData.subtotal || 0;
+      const courier = document.getElementById('co-courier').value;
+
+      // Gratis ongkir jika belanja >= Rp150.000 untuk kurir MeowPlace
+      let shipping = (subtotal >= 150000 && courier.includes('MeowPlace')) ? 0 : 15000;
+      if (courier.includes('SiCepat')) shipping = 12000;
+      if (courier.includes('JNE')) shipping = 15000;
+
+      const total = subtotal + shipping;
+
+      document.getElementById('co-subtotal-text').innerText = formatRupiah(subtotal);
+      document.getElementById('co-shipping-text').innerText = shipping === 0 ? 'GRATIS (Rp0)' : formatRupiah(shipping);
+      document.getElementById('co-total-text').innerText = formatRupiah(total);
+    }
+
+    async function handleRealCheckout(e) {
+      e.preventDefault();
+      const errBox = document.getElementById('co-error-alert');
+      const btn = document.getElementById('co-submit-btn');
+
+      errBox.style.display = 'none';
+      btn.disabled = true;
+      btn.innerText = 'Memproses Pesanan & Mengurangi Stok…';
+
+      const payload = {
+        customerName: document.getElementById('co-name').value.trim(),
+        phone: document.getElementById('co-phone').value.trim(),
+        email: document.getElementById('co-email').value.trim(),
+        address: document.getElementById('co-address').value.trim(),
+        courier: document.getElementById('co-courier').value,
+        paymentMethod: document.getElementById('co-payment').value,
+        notes: document.getElementById('co-notes').value.trim() || null,
+        items: currentCheckoutData.items.map(i => ({ productId: i.id, qty: i.qty }))
+      };
+
+      try {
+        const res = await fetch(`${API_ROOT}/orders/checkout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || 'Gagal memproses transaksi.');
+        }
+
+        const order = await res.json();
+        latestCreatedOrder = order;
+
+        // Simpan ke riwayat pesanan lokal
+        saveOrderToLocalStorage(order);
+
+        // Kosongkan keranjang belanja
+        window.dispatchEvent(new CustomEvent('meow:cart-clear'));
+
+        // Tutup modal checkout & buka struk transaksi
+        closeCheckoutModal();
+        openReceiptModal(order);
+      } catch (err) {
+        errBox.innerText = err.message;
+        errBox.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Bayar Sekarang & Konfirmasi';
+      }
+    }
+
+    // 3. STRUK PEMBAYARAN RESMI
+    function openReceiptModal(order) {
+      document.getElementById('rec-order-id').innerText = order.id;
+      document.getElementById('rec-datetime').innerText = new Date(order.createdAt || Date.now()).toLocaleString('id-ID', {
+        dateStyle: 'medium', timeStyle: 'short'
+      });
+      document.getElementById('rec-customer-name').innerText = order.customerName;
+      document.getElementById('rec-phone').innerText = order.phone || '-';
+      document.getElementById('rec-courier').innerText = order.courier;
+      document.getElementById('rec-payment-method').innerText = order.paymentMethod || 'QRIS';
+      document.getElementById('rec-address').innerText = order.address;
+
+      const itemsBody = document.getElementById('rec-items-body');
+      itemsBody.innerHTML = order.items.map(i => {
+        const pName = i.product ? i.product.name : i.productId;
+        const pPrice = i.product ? i.product.price : 0;
+        return `
+          <div class="rec-item-row">
+            <div><strong>${pName}</strong> <span style="color:#6B7280; font-size:0.75rem;">(${i.qty}×)</span></div>
+            <strong>${formatRupiah(pPrice * i.qty)}</strong>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('rec-subtotal').innerText = formatRupiah(order.subtotal);
+      document.getElementById('rec-shipping').innerText = order.shippingFee === 0 ? 'Rp0 (Gratis)' : formatRupiah(order.shippingFee);
+      document.getElementById('rec-total').innerText = formatRupiah(order.total);
+
+      document.getElementById('receipt-modal').style.display = 'flex';
+    }
+
+    function closeReceiptModal() {
+      document.getElementById('receipt-modal').style.display = 'none';
+    }
+
+    function printReceipt() {
+      window.print();
+    }
+
+    function trackThisReceipt() {
+      if (latestCreatedOrder) {
+        window.location.href = `bantuan.html#lacak-pesanan?order=${latestCreatedOrder.id}&email=${encodeURIComponent(latestCreatedOrder.email)}`;
+      } else {
+        window.location.href = 'bantuan.html#lacak-pesanan';
+      }
+    }
+
+    // 4. RIWAYAT PESANAN (ORDER HISTORY)
+    function saveOrderToLocalStorage(order) {
+      try {
+        let history = JSON.parse(localStorage.getItem('meow_order_history') || '[]');
+        history = history.filter(o => o.id !== order.id);
+        history.unshift(order);
+        localStorage.setItem('meow_order_history', JSON.stringify(history));
+        if (order.email) localStorage.setItem('meow_last_email', order.email);
+      } catch {}
+    }
+
+    async function openHistoryModal(e) {
+      if (e) e.preventDefault();
+      const modal = document.getElementById('history-modal');
+      const emailInput = document.getElementById('hist-email-input');
+      const savedEmail = localStorage.getItem('meow_last_email') || '';
+      if (emailInput && !emailInput.value && savedEmail) {
+        emailInput.value = savedEmail;
+      }
+
+      modal.style.display = 'flex';
+
+      let localOrders = [];
+      try {
+        localOrders = JSON.parse(localStorage.getItem('meow_order_history') || '[]');
+      } catch {}
+
+      if (savedEmail) {
+        await searchHistoryByEmail();
+      } else {
+        renderHistoryCards(localOrders);
+      }
+    }
+
+    function closeHistoryModal() {
+      document.getElementById('history-modal').style.display = 'none';
+    }
+
+    async function searchHistoryByEmail() {
+      const email = document.getElementById('hist-email-input').value.trim();
+      const container = document.getElementById('history-orders-container');
+
+      if (!email) {
+        let localOrders = [];
+        try { localOrders = JSON.parse(localStorage.getItem('meow_order_history') || '[]'); } catch {}
+        renderHistoryCards(localOrders);
+        return;
+      }
+
+      container.innerHTML = '<p style="text-align:center; padding:1.5rem; color:#6B7280;">Memuat riwayat pesanan dari database…</p>';
+
+      try {
+        const res = await fetch(`${API_ROOT}/orders/history?email=${encodeURIComponent(email)}`);
+        if (!res.ok) throw new Error('Gagal memuat pesanan');
+        const orders = await res.json();
+
+        localStorage.setItem('meow_last_email', email);
+        if (orders.length > 0) {
+          localStorage.setItem('meow_order_history', JSON.stringify(orders));
+        }
+
+        renderHistoryCards(orders);
+      } catch (err) {
+        let localOrders = [];
+        try { localOrders = JSON.parse(localStorage.getItem('meow_order_history') || '[]'); } catch {}
+        renderHistoryCards(localOrders);
+      }
+    }
+
+    function renderHistoryCards(orders) {
+      const container = document.getElementById('history-orders-container');
+      if (!orders || orders.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding: 2.5rem 1rem;">
+            <span style="font-size:3rem; display:block; margin-bottom:10px;">📦</span>
+            <h4 style="font-size:1.1rem; font-weight:700; margin-bottom:6px;">Belum Ada Riwayat Pesanan</h4>
+            <p style="font-size:0.85rem; color:#6B7280; margin-bottom:16px;">Semua pesanan yang kamu buat di MeowPlace akan tersimpan otomatis di sini.</p>
+            <button class="btn btn-primary btn-sm" onclick="closeHistoryModal()">Mulai Belanja Sekarang</button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = orders.map(o => {
+        const dt = new Date(o.createdAt || Date.now()).toLocaleDateString('id-ID', {
+          day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+        const itemsList = o.items.map(i => {
+          const pName = i.product ? i.product.name : i.productId;
+          return `<div style="font-size:0.83rem; color:#374151;">• ${pName} <strong>(${i.qty}×)</strong></div>`;
+        }).join('');
+
+        return `
+          <div style="border: 1px solid #E5E7EB; border-radius: 12px; padding: 14px 16px; background: #FFF; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+              <div>
+                <span style="font-size:0.72rem; color:#6B7280; text-transform:uppercase;">Nomor Pesanan</span>
+                <div style="font-size:1.05rem; font-weight:700; color:var(--primary);">${o.id}</div>
+                <span style="font-size:0.75rem; color:#6B7280;">📅 ${dt}</span>
+              </div>
+              <span class="status-badge status-${o.status}">${o.status}</span>
+            </div>
+
+            <div style="margin: 8px 0; background: #FDFBF7; padding: 8px 12px; border-radius: 8px; border: 1px solid #FED7AA;">
+              ${itemsList}
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #E5E7EB; padding-top:10px; margin-top:8px; flex-wrap:wrap; gap:8px;">
+              <div>
+                <span style="font-size:0.72rem; color:#6B7280;">Total Belanja (${o.paymentMethod || 'QRIS'})</span>
+                <div style="font-weight:700; font-size:1rem; color:#2B1B12;">${formatRupiah(o.total)}</div>
+              </div>
+              <div style="display:flex; gap:6px;">
+                <button class="btn btn-outline btn-sm" onclick="showReceiptById('${o.id}')">🧾 Struk</button>
+                <a href="bantuan.html#lacak-pesanan?order=${o.id}&email=${encodeURIComponent(o.email)}" class="btn btn-outline btn-sm">🚚 Lacak</a>
+                ${o.status === 'sampai' ? `<a href="bantuan.html#penilaian" class="btn btn-primary btn-sm">⭐ Ulas</a>` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function showReceiptById(orderId) {
+      try {
+        const res = await fetch(`${API_ROOT}/orders/${orderId}`);
+        if (!res.ok) throw new Error('Gagal mengambil data pesanan.');
+        const order = await res.json();
+        closeHistoryModal();
+        openReceiptModal(order);
+      } catch (err) {
+        alert('Gagal membuka struk: ' + err.message);
+      }
+    }
+  </script>
 
 </body>
 

@@ -1,0 +1,6 @@
+@MeowPlace.Api_HostAddress = http://localhost:5039
+
+GET {{MeowPlace.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

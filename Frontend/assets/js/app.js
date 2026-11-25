@@ -264,6 +264,10 @@
     remove(productId) {
       if (this.quantities.delete(productId)) this.commit();
     }
+    clear() {
+      this.quantities.clear();
+      this.commit();
+    }
     /* ---------- pertanyaan ---------- */
     quantityOf(productId) {
       return this.quantities.get(productId) ?? 0;
@@ -1029,10 +1033,29 @@
         (button) => button.addEventListener("click", () => this.hide({ restoreFocus: false }))
       );
       this.list.addEventListener("click", (event) => this.handleListClick(event));
-      this.find("[data-checkout]")?.addEventListener(
-        "click",
-        () => this.deps.notifier.notify("Checkout akan aktif setelah backend terhubung. Sabar ya, meong!", { duration: 3600 })
-      );
+      this.find("[data-checkout]")?.addEventListener("click", () => {
+        if (this.deps.cart.lines.length === 0) {
+          this.deps.notifier.notify("Keranjang belanja masih kosong.", { type: "error" });
+          return;
+        }
+        this.hide({ restoreFocus: false });
+        window.dispatchEvent(new CustomEvent("meow:open-checkout", {
+          detail: {
+            items: this.deps.cart.lines.map((l) => ({
+              id: l.product.id,
+              name: l.product.name,
+              price: l.product.price,
+              qty: l.quantity,
+              total: l.total
+            })),
+            subtotal: this.deps.cart.subtotal
+          }
+        }));
+      });
+      window.addEventListener("meow:cart-clear", () => {
+        this.deps.cart.clear();
+        this.render();
+      });
       this.deps.cart.subscribe(() => this.render());
       this.render();
     }
@@ -1546,7 +1569,7 @@
 
   // src/config.ts
   var config = {
-    useApi: false,
+    useApi: true,
     apiBaseUrl: "http://localhost:5000/api"
   };
 
