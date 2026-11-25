@@ -3,13 +3,13 @@ import { escapeHtml } from '../../core/dom';
 import { Formatter } from '../../core/Formatter';
 import type { Product } from '../../models/Product';
 import type { ProductCatalog } from '../../services/ProductCatalog';
-import { ProductArt } from '../ProductArt';
+import { ProductCardView } from '../ProductCardView';
 import { Layer } from './Layer';
 import type { LayerManager } from './LayerManager';
 
 /** Panel pencarian produk (buka lewat ikon kaca pembesar atau tombol "/"). */
 export class SearchPanel extends Layer {
-  private static readonly POPULAR = ['Salmon', 'Kasur', 'Pasir', 'Catnip', 'Camilan'];
+  private static readonly POPULAR = ['Anjing', 'Burung', 'Ikan', 'Pelet', 'Kasur', 'Camilan'];
 
   private readonly input: HTMLInputElement;
   private readonly results: HTMLElement;
@@ -103,10 +103,10 @@ export class SearchPanel extends Layer {
   private static resultHTML(product: Product, query: string, index: number): string {
     return `
       <button type="button" class="search-result" data-result="${product.id}" style="animation-delay:${index * 30}ms">
-        <span class="search-thumb" style="--tint:${product.tint}">${ProductArt.render(product.art)}</span>
+        <span class="search-thumb">${ProductCardView.photo(product)}</span>
         <span>
           <span class="search-result-name">${SearchPanel.highlight(product.name, query)}</span>
-          <span class="search-result-meta">${product.categoryLabel} · ${Formatter.rupiah(product.price)}</span>
+          <span class="search-result-meta">${product.pet.label} · ${product.categoryLabel} · ${Formatter.rupiah(product.price)}</span>
         </span>
       </button>`;
   }

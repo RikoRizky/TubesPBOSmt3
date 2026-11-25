@@ -1,7 +1,7 @@
 import { Motion } from '../core/Motion';
 import type { SmartHeader } from '../effects/SmartHeader';
 import type { Product } from '../models/Product';
-import { ProductArt } from './ProductArt';
+import { ProductCardView } from './ProductCardView';
 
 /** Animasi gambar produk "terbang" dari tombol ke ikon keranjang. */
 export class FlyToCart {
@@ -37,7 +37,7 @@ export class FlyToCart {
     dot.className = 'fly-dot';
     dot.style.left = '0px';
     dot.style.top = '0px';
-    dot.innerHTML = ProductArt.render(product.art);
+    dot.innerHTML = ProductCardView.photo(product, '', false);
     document.body.append(dot);
 
     const animation = dot.animate(

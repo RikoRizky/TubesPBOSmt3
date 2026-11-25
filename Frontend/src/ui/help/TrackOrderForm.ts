@@ -3,7 +3,7 @@ import { escapeHtml } from '../../core/dom';
 import { Formatter } from '../../core/Formatter';
 import { Motion } from '../../core/Motion';
 import { Order } from '../../models/Order';
-import { ProductArt } from '../ProductArt';
+import { ProductCardView } from '../ProductCardView';
 import { AsyncForm } from '../forms/AsyncForm';
 import { FormField } from '../forms/FormField';
 import { EmailValidator, OrderIdValidator, RequiredValidator } from '../forms/Validators';
@@ -94,7 +94,7 @@ export class TrackOrderForm extends AsyncForm {
 
     const itemsHTML = order.lines.map((line) => `
       <li class="track-item">
-        <span class="track-thumb" style="--tint:${line.product.tint}">${ProductArt.render(line.product.art)}</span>
+        <span class="track-thumb">${ProductCardView.photo(line.product)}</span>
         <p class="track-item-name">${escapeHtml(line.product.name)}<span>${line.quantity} × ${Formatter.rupiah(line.product.price)}</span></p>
         <p class="track-item-price">${Formatter.rupiah(line.total)}</p>
       </li>`).join('');

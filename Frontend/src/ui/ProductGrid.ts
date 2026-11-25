@@ -3,19 +3,14 @@ import type { INotifier } from '../contracts/INotifier';
 import type { IProductNavigator } from '../contracts/IProductNavigator';
 import { $, $$, restartAnimation } from '../core/dom';
 import { Motion } from '../core/Motion';
-import { Category } from '../models/enums';
 import type { Product } from '../models/Product';
+import { type CategoryFilter, type PetFilter, ProductFilter } from '../models/ProductFilter';
 import type { Cart } from '../services/Cart';
 import type { ProductCatalog } from '../services/ProductCatalog';
 import type { Wishlist } from '../services/Wishlist';
 import { Component } from './Component';
 import type { FlyToCart } from './FlyToCart';
-import { ProductArt } from './ProductArt';
 import { ProductCardView } from './ProductCardView';
-
-type Filter = 'semua' | 'favorit' | Category;
-
-const FILTERS: readonly string[] = ['semua', 'favorit', ...Object.values(Category)];
 
 export interface ProductGridDeps {
   catalog: ProductCatalog;
@@ -27,8 +22,8 @@ export interface ProductGridDeps {
 }
 
 /**
- * Daftar produk "Paling laris": filter kategori, skeleton loading,
- * empty/error state, tombol favorit & tambah ke keranjang.
+ * Daftar produk "Paling laris": filter jenis hewan + kategori, skeleton
+ * loading, empty/error state, tombol favorit & tambah ke keranjang.
  *
  * Mengimplementasikan DUA interface sekaligus:
  *  - IProductNavigator: bisa menampilkan produk tertentu / daftar favorit
@@ -37,7 +32,7 @@ export interface ProductGridDeps {
 export class ProductGrid extends Component implements IProductNavigator, IMeasurable {
   private static readonly PAGE_SIZE = 8;
 
-  private filter: Filter = 'semua';
+  private filter = ProductFilter.ALL;
   private visible = ProductGrid.PAGE_SIZE;
   private rendered = false;
   private loading: Promise<void> | null = null;
@@ -46,6 +41,7 @@ export class ProductGrid extends Component implements IProductNavigator, IMeasur
   private readonly section: HTMLElement | null;
   private readonly tabsWrap: HTMLElement | null;
   private readonly tabs: HTMLButtonElement[];
+  private readonly chips: HTMLButtonElement[];
   private readonly indicator: HTMLElement | null;
   private readonly loadMoreButton: HTMLButtonElement | null;
   private readonly loadMoreCount: HTMLElement | null;
@@ -56,8 +52,9 @@ export class ProductGrid extends Component implements IProductNavigator, IMeasur
   ) {
     super(root);
     this.section = root.closest('section');
-    this.tabsWrap = $('[data-filter-tabs]');
-    this.tabs = this.tabsWrap ? $$<HTMLButtonElement>('[data-filter]', this.tabsWrap) : [];
+    this.tabsWrap = $('[data-pet-tabs]');
+    this.tabs = this.tabsWrap ? $$<HTMLButtonElement>('[data-pet]', this.tabsWrap) : [];
+    this.chips = $$<HTMLButtonElement>('[data-category-chips] [data-category]');
     this.indicator = $('[data-filter-indicator]');
     this.loadMoreButton = $<HTMLButtonElement>('[data-load-more]');
     this.loadMoreCount = $('[data-load-more-count]');
@@ -70,20 +67,24 @@ export class ProductGrid extends Component implements IProductNavigator, IMeasur
 
     this.tabs.forEach((tab, i) => {
       tab.setAttribute('aria-controls', this.root.id);
-      tab.addEventListener('click', () => this.setFilter(tab.dataset.filter as Filter));
+      tab.addEventListener('click', () => this.selectPet(tab.dataset.pet as PetFilter));
       tab.addEventListener('keydown', (event) => {
         if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
         event.preventDefault();
         const next = this.tabs[(i + (event.key === 'ArrowRight' ? 1 : -1) + this.tabs.length) % this.tabs.length];
         next.focus();
-        this.setFilter(next.dataset.filter as Filter);
+        this.selectPet(next.dataset.pet as PetFilter);
       });
     });
 
-    // tautan kategori di mana pun (kartu kategori, promo, footer)
+    this.chips.forEach((chip) =>
+      chip.addEventListener('click', () => this.setFilter(this.filter.withCategory(chip.dataset.category as CategoryFilter))),
+    );
+
+    // tautan jenis hewan / kategori di mana pun (kartu hewan, promo, footer)
     $$('[data-filter-link]').forEach((link) =>
       link.addEventListener('click', () => {
-        this.setFilter(link.dataset.filterLink as Filter);
+        this.applyLink(link.dataset.filterLink ?? '');
         void this.load();
       }),
     );
@@ -91,9 +92,11 @@ export class ProductGrid extends Component implements IProductNavigator, IMeasur
     this.loadMoreButton?.addEventListener('click', () => this.loadMore());
     this.root.addEventListener('click', (event) => this.handleClick(event));
     this.root.addEventListener('animationend', (event) => {
-      const target = event.target as HTMLElement;
-      target.classList.remove('is-entering', 'is-flash');
+      (event.target as HTMLElement).classList.remove('is-entering', 'is-flash');
     });
+
+    // jumlah di chip "Favorit" ikut berubah saat favorit berubah
+    this.deps.wishlist.subscribe(() => this.syncControls(false));
 
     // muat produk saat section mulai terlihat (lazy-load dari API)
     new IntersectionObserver(([entry], observer) => {
@@ -102,23 +105,28 @@ export class ProductGrid extends Component implements IProductNavigator, IMeasur
       void this.load();
     }, { rootMargin: '0px 0px -10% 0px' }).observe(this.root);
 
-    this.syncTabs(false);
+    this.syncControls(false);
   }
 
   measure(): void {
-    this.syncTabs(false);
+    this.syncControls(false);
   }
 
-  /** Tautan dari halaman lain: ?kategori=mainan atau ?produk=p01 */
+  /** Tautan dari halaman lain: ?hewan=anjing, ?kategori=mainan, ?produk=p01 */
   applyUrlParams(params: URLSearchParams): void {
+    const hewan = params.get('hewan');
     const kategori = params.get('kategori');
     const produk = params.get('produk');
-    if (kategori && ProductGrid.isFilter(kategori)) {
-      this.filter = kategori;
-      this.syncTabs(false);
-    }
+
+    let filter = ProductFilter.ALL;
+    if (hewan && ProductFilter.isPetFilter(hewan)) filter = filter.withPet(hewan);
+    if (kategori === 'favorit') filter = filter.withPet('favorit'); // tautan versi lama
+    else if (kategori && ProductFilter.isCategoryFilter(kategori)) filter = filter.withCategory(kategori);
+    this.filter = filter;
+    this.syncControls(false);
+
     if (produk) window.setTimeout(() => this.showProduct(produk), 300);
-    if (kategori || produk) history.replaceState(null, '', location.pathname + location.hash);
+    if (hewan || kategori || produk) history.replaceState(null, '', location.pathname + location.hash);
   }
 
   /* ==================== IProductNavigator ==================== */
@@ -128,18 +136,33 @@ export class ProductGrid extends Component implements IProductNavigator, IMeasur
   }
 
   showFavorites(): void {
-    this.setFilter('favorit');
+    this.setFilter(new ProductFilter('favorit'));
     void this.load();
     this.section?.scrollIntoView({ behavior: Motion.scrollBehavior });
   }
 
   /* ==================== filter & render ==================== */
 
-  setFilter(filter: Filter): void {
-    if (filter === this.filter && this.rendered) return;
+  /** "kucing" -> filter hewan, "mainan" -> filter kategori (dari semua hewan). */
+  private applyLink(value: string): void {
+    if (ProductFilter.isPetFilter(value)) this.setFilter(new ProductFilter(value));
+    else if (ProductFilter.isCategoryFilter(value)) this.setFilter(new ProductFilter('semua', value));
+  }
+
+  /** Ganti hewan; bila kategori terpilih kosong untuk hewan itu, kembali ke semua kategori. */
+  private selectPet(pet: PetFilter): void {
+    let next = this.filter.withPet(pet);
+    if (this.deps.catalog.isLoaded && next.category !== 'semua' && this.count(next) === 0) {
+      next = next.withCategory('semua');
+    }
+    this.setFilter(next);
+  }
+
+  setFilter(filter: ProductFilter): void {
+    if (filter.equals(this.filter) && this.rendered) return;
     this.filter = filter;
     this.visible = ProductGrid.PAGE_SIZE;
-    this.syncTabs(true);
+    this.syncControls(true);
     if (!this.rendered) return; // dirender saat data selesai dimuat
 
     if (Motion.reduced) {
@@ -166,10 +189,11 @@ export class ProductGrid extends Component implements IProductNavigator, IMeasur
       .load()
       .then(() => {
         this.rendered = true;
+        this.syncControls(false);
         this.render();
       })
       .catch(() => {
-        this.root.innerHTML = ProductGrid.errorHTML();
+        this.root.innerHTML = ProductGrid.stateHTML('Gagal memuat produk', 'Sepertinya koneksi sedang bermasalah. Coba muat ulang.', 'i-alert', '<button class="btn btn-primary btn-sm" type="button" data-retry>Coba lagi</button>');
         this.root.setAttribute('aria-busy', 'false');
       })
       .finally(() => {
@@ -179,12 +203,14 @@ export class ProductGrid extends Component implements IProductNavigator, IMeasur
     return this.loading;
   }
 
-  /** Produk yang lolos filter aktif. Memakai getter `category` milik tiap objek. */
-  private filtered(): Product[] {
-    const all = this.deps.catalog.all;
-    if (this.filter === 'semua') return [...all];
-    if (this.filter === 'favorit') return all.filter((product) => this.deps.wishlist.has(product.id));
-    return all.filter((product) => product.category === this.filter);
+  private isFavorite = (productId: string): boolean => this.deps.wishlist.has(productId);
+
+  private filtered(filter = this.filter): Product[] {
+    return this.deps.catalog.all.filter((product) => filter.matches(product, this.isFavorite));
+  }
+
+  private count(filter: ProductFilter): number {
+    return this.filtered(filter).length;
   }
 
   private render(animate = true): void {
@@ -192,7 +218,7 @@ export class ProductGrid extends Component implements IProductNavigator, IMeasur
     this.root.innerHTML = list.length
       ? list
           .slice(0, this.visible)
-          .map((product, index) => ProductCardView.render(product, { wished: this.deps.wishlist.has(product.id), index }))
+          .map((product, index) => ProductCardView.render(product, { wished: this.isFavorite(product.id), index }))
           .join('')
       : this.emptyHTML();
 
@@ -207,7 +233,7 @@ export class ProductGrid extends Component implements IProductNavigator, IMeasur
     this.visible += ProductGrid.PAGE_SIZE;
     const html = list
       .slice(start, this.visible)
-      .map((product, index) => ProductCardView.render(product, { wished: this.deps.wishlist.has(product.id), index }))
+      .map((product, index) => ProductCardView.render(product, { wished: this.isFavorite(product.id), index }))
       .join('');
     this.root.insertAdjacentHTML('beforeend', html);
     this.updateLoadMore(list);
@@ -224,9 +250,9 @@ export class ProductGrid extends Component implements IProductNavigator, IMeasur
     await this.load();
     let index = this.filtered().findIndex((product) => product.id === productId);
     if (index === -1) {
-      this.filter = 'semua';
-      this.syncTabs(true);
-      index = this.deps.catalog.all.findIndex((product) => product.id === productId);
+      this.filter = ProductFilter.ALL;
+      this.syncControls(true);
+      index = this.filtered().findIndex((product) => product.id === productId);
     }
     if (index === -1) return;
 
@@ -240,17 +266,30 @@ export class ProductGrid extends Component implements IProductNavigator, IMeasur
     restartAnimation(card, 'is-flash');
   }
 
-  /* ==================== tab filter ==================== */
+  /* ==================== tab hewan & chip kategori ==================== */
 
-  private syncTabs(scrollTab: boolean): void {
+  private syncControls(scrollTab: boolean): void {
     this.tabs.forEach((tab) => {
-      const on = tab.dataset.filter === this.filter;
+      const on = tab.dataset.pet === this.filter.pet;
       tab.setAttribute('aria-selected', String(on));
       tab.tabIndex = on ? 0 : -1;
     });
-    const active = this.tabs.find((tab) => tab.dataset.filter === this.filter);
-    if (!active || !this.indicator || !this.tabsWrap) return;
 
+    // chip kategori: tandai yang aktif & tampilkan jumlah produk untuk hewan terpilih
+    const loaded = this.deps.catalog.isLoaded;
+    this.chips.forEach((chip) => {
+      const category = chip.dataset.category as CategoryFilter;
+      const on = category === this.filter.category;
+      chip.setAttribute('aria-pressed', String(on));
+      const counter = chip.querySelector('.chip-count');
+      if (!loaded || !counter) return;
+      const total = this.count(this.filter.withCategory(category));
+      counter.textContent = String(total);
+      chip.disabled = total === 0 && !on;
+    });
+
+    const active = this.tabs.find((tab) => tab.dataset.pet === this.filter.pet);
+    if (!active || !this.indicator || !this.tabsWrap) return;
     this.indicator.style.setProperty('--x', `${active.offsetLeft}px`);
     this.indicator.style.setProperty('--w', `${active.offsetWidth}px`);
 
@@ -271,7 +310,7 @@ export class ProductGrid extends Component implements IProductNavigator, IMeasur
     if (wishButton?.dataset.wish) this.toggleWish(wishButton.dataset.wish, wishButton);
     else if (addButton?.dataset.add) this.addToCart(addButton.dataset.add, addButton);
     else if (target.closest('[data-retry]')) void this.load();
-    else if (target.closest('[data-go-all]')) this.setFilter('semua');
+    else if (target.closest('[data-go-all]')) this.setFilter(ProductFilter.ALL);
   }
 
   private toggleWish(productId: string, button: HTMLButtonElement): void {
@@ -285,7 +324,7 @@ export class ProductGrid extends Component implements IProductNavigator, IMeasur
 
     if (added) {
       this.deps.notifier.notify(`${product.name} disimpan ke favorit`, { action: 'Lihat', onAction: () => this.showFavorites() });
-    } else if (this.filter === 'favorit') {
+    } else if (this.filter.pet === 'favorit') {
       window.setTimeout(() => this.render(false), 300);
     }
   }
@@ -294,7 +333,10 @@ export class ProductGrid extends Component implements IProductNavigator, IMeasur
     const product = this.deps.catalog.find(productId);
     if (!product) return;
 
-    this.deps.cart.add(productId);
+    if (!this.deps.cart.add(productId)) {
+      this.deps.notifier.notify(`${product.name} sedang habis. Coba lagi nanti, ya.`, { type: 'error' });
+      return;
+    }
 
     button.classList.add('is-added');
     button.innerHTML = '<svg class="icon"><use href="#i-check"/></svg>';
@@ -315,35 +357,20 @@ export class ProductGrid extends Component implements IProductNavigator, IMeasur
   /* ==================== state kosong / galat ==================== */
 
   private emptyHTML(): string {
-    if (this.filter === 'favorit') {
-      return `
-        <div class="grid-state">
-          <div class="grid-state-art">${ProductArt.render({ type: 'bed', palette: 'cream' })}</div>
-          <h3>Belum ada favorit</h3>
-          <p>Ketuk ikon hati di produk mana pun untuk menyimpannya di sini.</p>
-          <button class="btn btn-ghost btn-sm" type="button" data-go-all>Lihat semua produk</button>
-        </div>`;
+    const allButton = '<button class="btn btn-ghost btn-sm" type="button" data-go-all>Lihat semua produk</button>';
+    if (this.filter.pet === 'favorit') {
+      return ProductGrid.stateHTML('Belum ada favorit', 'Ketuk ikon hati di produk mana pun untuk menyimpannya di sini.', 'i-heart', allButton);
     }
-    return `
-      <div class="grid-state">
-        <div class="grid-state-art">${ProductArt.render({ type: 'yarn', palette: 'orange' })}</div>
-        <h3>Stok sedang diisi ulang</h3>
-        <p>Kategori ini belum punya produk. Cek lagi nanti, ya.</p>
-        <button class="btn btn-ghost btn-sm" type="button" data-go-all>Lihat semua produk</button>
-      </div>`;
+    return ProductGrid.stateHTML('Belum ada produk di sini', 'Kombinasi hewan dan kategori ini sedang kosong. Coba kategori lain, ya.', 'i-paw', allButton);
   }
 
-  private static errorHTML(): string {
+  private static stateHTML(title: string, text: string, icon: string, action: string): string {
     return `
-      <div class="grid-state" role="alert">
-        <div class="grid-state-art">${ProductArt.render({ type: 'mouse', palette: 'brown' })}</div>
-        <h3>Gagal memuat produk</h3>
-        <p>Sepertinya koneksi sedang bermasalah. Coba muat ulang.</p>
-        <button class="btn btn-primary btn-sm" type="button" data-retry>Coba lagi</button>
+      <div class="grid-state" role="${icon === 'i-alert' ? 'alert' : 'status'}">
+        <span class="grid-state-icon"><svg class="icon ${icon === 'i-paw' ? 'icon--fill' : ''}"><use href="#${icon}"/></svg></span>
+        <h3>${title}</h3>
+        <p>${text}</p>
+        ${action}
       </div>`;
-  }
-
-  private static isFilter(value: string): value is Filter {
-    return FILTERS.includes(value);
   }
 }

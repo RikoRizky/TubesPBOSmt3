@@ -1,7 +1,8 @@
 import { Category } from './enums';
-import type { ArtSpec, ProductDTO } from './dto';
+import type { ProductDTO } from './dto';
+import { Pet } from './Pet';
 
-export type BadgeVariant = 'sale' | 'new' | 'hot';
+export type BadgeVariant = 'sale' | 'new' | 'hot' | 'out';
 
 export interface Badge {
   label: string;
@@ -20,11 +21,14 @@ export abstract class Product {
   readonly name: string;
   readonly rating: number;
   readonly reviews: number;
-  readonly art: ArtSpec;
-  readonly tint: string;
+  /** Jenis hewan (COMPOSITION: Product "memiliki" Pet) */
+  readonly pet: Pet;
+  readonly image: string;
 
   private readonly _price: number;
   private readonly _oldPrice: number | null;
+  /** null = stok tidak dilacak (selalu tersedia) */
+  private readonly _stock: number | null;
   protected readonly badgeText: string | null;
 
   constructor(dto: ProductDTO) {
@@ -34,10 +38,11 @@ export abstract class Product {
     this.name = dto.name;
     this.rating = dto.rating;
     this.reviews = dto.reviews;
-    this.art = dto.art;
-    this.tint = dto.tint;
+    this.pet = Pet.from(dto.pet);
+    this.image = dto.image || this.pet.photo;
     this._price = dto.price;
     this._oldPrice = dto.oldPrice ?? null;
+    this._stock = dto.stock ?? null;
     this.badgeText = dto.badge ?? null;
   }
 
@@ -67,20 +72,25 @@ export abstract class Product {
     return Math.round((1 - this._price / this._oldPrice) * 100);
   }
 
+  get isAvailable(): boolean {
+    return this._stock === null || this._stock > 0;
+  }
+
   /* ---------- perilaku bersama ---------- */
 
-  /** Badge di kartu produk: diskon diutamakan, lalu label dari backend. */
+  /** Badge di kartu produk: stok habis > diskon > label dari backend. */
   getBadge(): Badge | null {
+    if (!this.isAvailable) return { label: 'Stok habis', variant: 'out' };
     if (this.isOnSale) return { label: `-${this.discountPercent}%`, variant: 'sale' };
     if (this.badgeText === 'Baru') return { label: 'Baru', variant: 'new' };
     if (this.badgeText) return { label: this.badgeText, variant: 'hot' };
     return null;
   }
 
-  /** Dipakai fitur pencarian: cocokkan dengan nama & label kategori. */
+  /** Dipakai fitur pencarian: cocokkan dengan nama, kategori, dan jenis hewan. */
   matches(query: string): boolean {
     const q = query.trim().toLowerCase();
-    return q.length > 0 && `${this.name} ${this.categoryLabel}`.toLowerCase().includes(q);
+    return q.length > 0 && `${this.name} ${this.categoryLabel} ${this.pet.label}`.toLowerCase().includes(q);
   }
 }
 

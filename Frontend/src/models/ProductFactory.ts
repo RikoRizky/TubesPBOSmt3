@@ -11,7 +11,8 @@ export class ProductFactory {
   private constructor() {}
 
   static create(dto: ProductDTO): Product {
-    switch (dto.category) {
+    // backend bisa mengirim "Makanan" atau "makanan": samakan dulu
+    switch (String(dto.category).trim().toLowerCase()) {
       case Category.Makanan:
         return new FoodProduct(dto);
       case Category.Camilan:
