@@ -248,10 +248,13 @@
     static STORAGE_KEY = "cart";
     quantities;
     /* ---------- perintah ---------- */
+    /** Mengembalikan false bila produk sedang habis. */
     add(productId, quantity = 1) {
       if (quantity <= 0) throw new Error("Jumlah yang ditambahkan harus lebih dari 0.");
+      if (this.catalog.find(productId)?.isAvailable === false) return false;
       this.quantities.set(productId, this.quantityOf(productId) + quantity);
       this.commit();
+      return true;
     }
     setQuantity(productId, quantity) {
       if (quantity <= 0) {
@@ -345,7 +348,7 @@
       location.href = `index.html?produk=${encodeURIComponent(productId)}`;
     }
     showFavorites() {
-      location.href = "index.html?kategori=favorit#belanja";
+      location.href = "index.html?hewan=favorit#belanja";
     }
   };
   var ProductNavigator = class {
@@ -457,170 +460,72 @@
     }
   };
 
-  // src/ui/ProductArt.ts
-  var INK = "#2B1B12";
-  var ProductArt = class _ProductArt {
-    static palettes = {
-      orange: { main: "#F97316", dark: "#C2410C", light: "#FFF4E6", soft: "#FDBA74" },
-      tangerine: { main: "#FB923C", dark: "#EA580C", light: "#FFF7ED", soft: "#FED7AA" },
-      brown: { main: "#9A5B34", dark: "#6B3A1E", light: "#FBEBDD", soft: "#D9A47C" },
-      honey: { main: "#F5B342", dark: "#C77D12", light: "#FFF8E6", soft: "#FCD98F" },
-      rust: { main: "#DC5A2A", dark: "#9F3A16", light: "#FFF1EA", soft: "#F4A383" },
-      cream: { main: "#F1DEC6", dark: "#B98B5E", light: "#FFFFFF", soft: "#E3C7A4" }
-    };
-    static templates = {
-      bag: (c) => `
-      ${_ProductArt.shadow(100, 186, 60)}
-      <path d="M54 44h92l10 128a10 10 0 0 1-10 11H54a10 10 0 0 1-10-11Z" fill="${c.main}"/>
-      <path d="M146 44l10 128a10 10 0 0 1-10 11h-14l10-139Z" fill="${c.dark}" opacity=".22"/>
-      <rect x="49" y="28" width="102" height="22" rx="5" fill="${c.dark}"/>
-      <path d="M60 34v10M70 34v10M80 34v10M90 34v10M100 34v10M110 34v10M120 34v10M130 34v10M140 34v10" stroke="#fff" stroke-opacity=".28" stroke-width="2.5" stroke-linecap="round"/>
-      <circle cx="100" cy="104" r="36" fill="${c.light}"/>
-      ${_ProductArt.catFace(100, 104, 1.15, c.main)}
-      <rect x="68" y="152" width="64" height="9" rx="4.5" fill="${c.light}"/>
-      <rect x="80" y="166" width="40" height="6" rx="3" fill="${c.light}" opacity=".6"/>
-      ${_ProductArt.gloss("M62 58l-5 104")}`,
-      can: (c) => `
-      ${_ProductArt.shadow(100, 182, 54)}
-      <path d="M54 76v86c0 9 20.6 16 46 16s46-7 46-16V76Z" fill="${c.main}"/>
-      <path d="M54 98c0 9 20.6 16 46 16s46-7 46-16v44c0 9-20.6 16-46 16s-46-7-46-16Z" fill="${c.light}"/>
-      <ellipse cx="100" cy="76" rx="46" ry="16" fill="#EDE3D8"/>
-      <ellipse cx="100" cy="76" rx="38" ry="12" fill="#DCCBBB"/>
-      <rect x="88" y="66" width="24" height="9" rx="4.5" fill="#fff" opacity=".9"/>
-      <path d="M78 133c8-10 24-10 32 0-8 10-24 10-32 0Z" fill="${c.main}"/>
-      <path d="M108 133l12-8v16Z" fill="${c.main}"/>
-      <circle cx="86" cy="131" r="2" fill="${INK}"/>
-      ${_ProductArt.gloss("M64 90v66")}`,
-      pouch: (c) => `
-      ${_ProductArt.shadow(100, 186, 54)}
-      <path d="M60 40h80l8 132a9 9 0 0 1-9 10H61a9 9 0 0 1-9-10Z" fill="${c.main}"/>
-      <rect x="56" y="30" width="88" height="16" rx="4" fill="${c.dark}"/>
-      <path d="M64 56h72" stroke="${c.dark}" stroke-opacity=".5" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 6"/>
-      <rect x="70" y="70" width="60" height="10" rx="5" fill="${c.light}"/>
-      <rect x="68" y="92" width="64" height="52" rx="26" fill="${c.light}"/>
-      <circle cx="86" cy="112" r="7" fill="${c.soft}"/>
-      <circle cx="102" cy="122" r="8" fill="${c.dark}" opacity=".75"/>
-      <circle cx="116" cy="110" r="6" fill="${c.soft}"/>
-      <circle cx="94" cy="130" r="5" fill="${c.dark}" opacity=".6"/>
-      <circle cx="113" cy="130" r="4.5" fill="${c.soft}"/>
-      <rect x="80" y="156" width="40" height="6" rx="3" fill="${c.light}" opacity=".7"/>
-      ${_ProductArt.gloss("M66 62l-4 100")}`,
-      mouse: (c) => `
-      ${_ProductArt.shadow(108, 170, 64)}
-      <path d="M52 150c-18 2-28-8-24-18 4-12 22-10 20 2" fill="none" stroke="${c.dark}" stroke-width="5" stroke-linecap="round"/>
-      <path d="M48 154C48 116 78 90 116 90c30 0 56 32 56 50 0 10-8 14-18 14Z" fill="${c.main}"/>
-      <circle cx="122" cy="86" r="18" fill="${c.main}"/>
-      <circle cx="122" cy="86" r="10" fill="${c.soft}"/>
-      <circle cx="148" cy="122" r="4.5" fill="${INK}"/>
-      <circle cx="149.5" cy="120.5" r="1.4" fill="#fff"/>
-      <circle cx="171" cy="141" r="6" fill="${c.soft}"/>
-      <path d="M160 147l18 4M158 151l14 10" stroke="${INK}" stroke-opacity=".45" stroke-width="1.6" stroke-linecap="round"/>
-      <path d="M66 148c4-22 18-38 38-46" fill="none" stroke="${c.light}" stroke-opacity=".8" stroke-width="2.5" stroke-dasharray="3 6" stroke-linecap="round"/>`,
-      yarn: (c) => `
-      ${_ProductArt.shadow(100, 178, 56)}
-      <path d="M146 140c18 8 28 24 20 40" fill="none" stroke="${c.main}" stroke-width="5" stroke-linecap="round"/>
-      <circle cx="100" cy="110" r="58" fill="${c.main}"/>
-      <g fill="none" stroke="${c.dark}" stroke-width="4" stroke-linecap="round" opacity=".5">
-        <path d="M48 86c34 6 66 36 76 76"/>
-        <path d="M56 142c22-34 54-62 92-64"/>
-        <path d="M80 56c-6 34 6 76 40 108"/>
-        <path d="M122 56c10 34 2 76-30 108"/>
-      </g>
-      <path d="M66 82a44 44 0 0 1 28-22" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="7" stroke-linecap="round"/>`,
-      wand: (c) => `
-      ${_ProductArt.shadow(100, 186, 50)}
-      <path d="M46 178 150 52" stroke="${c.dark}" stroke-width="6" stroke-linecap="round"/>
-      <path d="M46 178l20-24" stroke="${INK}" stroke-opacity=".75" stroke-width="9" stroke-linecap="round"/>
-      <path d="M150 52c18 8 22 28 12 46" fill="none" stroke="${INK}" stroke-opacity=".5" stroke-width="1.8"/>
-      <g transform="translate(162 100)">
-        <path d="M0 0c-14 10-18 34-8 52 10-14 14-36 8-52Z" fill="${c.main}"/>
-        <path d="M0 0c10 8 18 30 10 50-10-12-14-34-10-50Z" fill="${c.soft}"/>
-        <path d="M0 0c-2 14 0 40 2 56" stroke="${c.dark}" stroke-width="1.5" fill="none"/>
-      </g>
-      <circle cx="162" cy="100" r="4" fill="${c.dark}"/>`,
-      scratcher: (c) => {
-        let sisal = "";
-        for (let y = 70; y <= 158; y += 8) sisal += `M80 ${y}h40`;
-        return `
-      ${_ProductArt.shadow(100, 188, 66)}
-      <rect x="36" y="164" width="128" height="20" rx="7" fill="${c.dark}"/>
-      <rect x="80" y="62" width="40" height="104" fill="#E9C99B"/>
-      <path d="${sisal}" stroke="#C99B62" stroke-width="2"/>
-      <rect x="44" y="44" width="112" height="22" rx="7" fill="${c.main}"/>
-      <rect x="48" y="47" width="104" height="6" rx="3" fill="#fff" opacity=".2"/>
-      <path d="M140 66v34" stroke="${INK}" stroke-opacity=".6" stroke-width="2"/>
-      <circle cx="140" cy="108" r="9" fill="#F97316"/>
-      <path d="M134 104a8 8 0 0 1 8-4" stroke="#fff" stroke-opacity=".6" stroke-width="2.5" stroke-linecap="round" fill="none"/>`;
-      },
-      bed: (c) => `
-      ${_ProductArt.shadow(100, 172, 84)}
-      <ellipse cx="100" cy="132" rx="82" ry="42" fill="${c.dark}"/>
-      <ellipse cx="100" cy="126" rx="82" ry="40" fill="${c.main}"/>
-      <ellipse cx="100" cy="122" rx="56" ry="24" fill="${c.dark}" opacity=".35"/>
-      <ellipse cx="100" cy="126" rx="54" ry="22" fill="${c.light}"/>
-      <g transform="translate(100 118)">
-        <path d="M-40 10C-40-14-18-26 4-26c22 0 36 14 36 32 0 8-6 10-14 10h-60c-4 0-6-2-6-6Z" fill="#FB923C"/>
-        <path d="M0-24q4 8 0 14M14-22q4 8 0 14M26-16q3 7 0 12" stroke="#EA580C" stroke-opacity=".55" stroke-width="3" fill="none" stroke-linecap="round"/>
-        <path d="M-46 4l-2-16 9 7h12l9-7-2 16c0 8-6 12-13 12s-13-4-13-12Z" fill="#FB923C"/>
-        <path d="M-41 5q2.5 2 5 0M-30 5q2.5 2 5 0" stroke="${INK}" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-        <path d="M38 8c-4 12-30 14-56 10" stroke="#EA580C" stroke-width="7" fill="none" stroke-linecap="round"/>
-      </g>
-      <path d="M30 112c14-22 42-34 70-34s56 12 70 34" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="6" stroke-linecap="round"/>`,
-      litter: (c) => `
-      ${_ProductArt.shadow(100, 188, 56)}
-      <path d="M66 64c0-34 68-34 68 0" fill="none" stroke="${c.dark}" stroke-width="6" stroke-linecap="round"/>
-      <path d="M52 66h96l-8 108a9 9 0 0 1-9 8H69a9 9 0 0 1-9-8Z" fill="${c.main}"/>
-      <rect x="46" y="56" width="108" height="18" rx="6" fill="${c.dark}"/>
-      <rect x="66" y="94" width="68" height="60" rx="14" fill="${c.light}"/>
-      <rect x="78" y="104" width="44" height="7" rx="3.5" fill="${c.main}" opacity=".7"/>
-      <g fill="${c.soft}">
-        <circle cx="84" cy="130" r="5"/><circle cx="96" cy="136" r="4"/><circle cx="108" cy="128" r="5.5"/>
-        <circle cx="119" cy="138" r="4"/><circle cx="92" cy="122" r="3.5"/><circle cx="105" cy="143" r="3"/>
-      </g>
-      ${_ProductArt.gloss("M62 82l5 84")}`,
-      fountain: (c) => `
-      ${_ProductArt.shadow(100, 186, 60)}
-      <path d="M46 118h108l-9 56a10 10 0 0 1-10 8H65a10 10 0 0 1-10-8Z" fill="${c.main}"/>
-      <ellipse cx="100" cy="118" rx="54" ry="14" fill="${c.dark}"/>
-      <ellipse cx="100" cy="118" rx="46" ry="10" fill="#A8DCEB"/>
-      <rect x="93" y="70" width="14" height="48" rx="7" fill="${c.light}"/>
-      <path d="M100 74c-4-18-26-22-34 6M100 74c4-18 26-22 34 6" fill="none" stroke="#A8DCEB" stroke-width="5" stroke-linecap="round"/>
-      <circle cx="64" cy="96" r="3" fill="#A8DCEB"/><circle cx="136" cy="96" r="3" fill="#A8DCEB"/>
-      <rect x="86" y="148" width="28" height="6" rx="3" fill="${c.light}" opacity=".8"/>
-      ${_ProductArt.gloss("M58 132l5 36")}`
-    };
+  // src/ui/ProductCardView.ts
+  var BADGE_CLASS = {
+    sale: "badge",
+    new: "badge badge--new",
+    hot: "badge badge--hot",
+    out: "badge badge--out"
+  };
+  var ProductCardView = class _ProductCardView {
     constructor() {
     }
-    /** Hasilkan string <svg> untuk sebuah produk. */
-    static render(spec) {
-      const template = _ProductArt.templates[spec.type] ?? _ProductArt.templates.bag;
-      const palette = _ProductArt.palettes[spec.palette] ?? _ProductArt.palettes.orange;
-      return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">${template(palette)}</svg>`;
+    /** Foto produk sebagai elemen <img>. */
+    static photo(product, className = "", lazy = true) {
+      return `<img class="${className}" src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}"
+      width="600" height="600" ${lazy ? 'loading="lazy"' : ""} decoding="async">`;
     }
-    /** Isi semua elemen [data-art="jenis:palet"] di dalam root. */
-    static hydrate(root = document) {
-      root.querySelectorAll("[data-art]").forEach((element) => {
-        if (element.dataset.artReady) return;
-        const [type, palette] = (element.dataset.art ?? "").split(":");
-        element.innerHTML = _ProductArt.render({ type, palette });
-        element.dataset.artReady = "true";
-      });
-    }
-    /* ---------- potongan gambar yang dipakai ulang ---------- */
-    static shadow(cx, cy, rx) {
-      return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="7" fill="${INK}" opacity=".1"/>`;
-    }
-    static gloss(d) {
-      return `<path d="${d}" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="7" stroke-linecap="round"/>`;
-    }
-    static catFace(cx, cy, scale, fill) {
+    static render(product, options) {
+      const { wished, index } = options;
+      const name = escapeHtml(product.name);
+      const badge = product.getBadge();
+      const available = product.isAvailable;
       return `
-      <g transform="translate(${cx} ${cy}) scale(${scale})">
-        <path d="M-16 -6 L-18 -22 L-6 -14 H6 L18 -22 L16 -6 C19 -2 20 1 20 5 C20 14 11 20 0 20 S-20 14 -20 5 C-20 1 -19 -2 -16 -6 Z" fill="${fill}"/>
-        <circle cx="-7" cy="3" r="2.6" fill="${INK}"/>
-        <circle cx="7" cy="3" r="2.6" fill="${INK}"/>
-        <path d="M-2.5 9 H2.5 L0 11.8 Z" fill="${INK}"/>
-      </g>`;
+      <article class="product-card is-entering${available ? "" : " is-out"}" data-id="${product.id}" style="--d:${Math.min(index * 40, 300)}ms">
+        <div class="product-media">
+          ${_ProductCardView.photo(product, "product-img")}
+          ${badge ? `<span class="${BADGE_CLASS[badge.variant]}">${escapeHtml(badge.label)}</span>` : ""}
+          <button class="wish-btn" type="button" data-wish="${product.id}" aria-pressed="${wished}"
+            aria-label="${wished ? "Hapus dari" : "Simpan ke"} favorit: ${name}">
+            <svg class="icon"><use href="#i-heart"/></svg>
+          </button>
+        </div>
+        <div class="product-body">
+          <p class="product-cat">
+            <svg class="icon"><use href="#${product.pet.icon}"/></svg>
+            ${product.pet.label} \xB7 ${product.categoryLabel}
+          </p>
+          <h3 class="product-name">${name}</h3>
+          <p class="product-rating">
+            <svg class="icon icon--fill"><use href="#i-star"/></svg>
+            ${Formatter.decimal(product.rating, 1)} <span>(${Formatter.compact(product.reviews)} ulasan)</span>
+          </p>
+          <div class="product-foot">
+            <p class="price">
+              <strong>${Formatter.rupiah(product.price)}</strong>${product.oldPrice ? `<s>${Formatter.rupiah(product.oldPrice)}</s>` : ""}
+            </p>
+            <button class="add-btn" type="button" data-add="${product.id}" ${available ? "" : "disabled"}
+              aria-label="${available ? "Tambah ke keranjang" : "Stok habis"}: ${name}">
+              <svg class="icon"><use href="#i-bag-plus"/></svg>
+            </button>
+          </div>
+        </div>
+      </article>`;
+    }
+    static skeleton() {
+      return `
+      <div class="product-card is-skeleton" aria-hidden="true">
+        <div class="product-media skeleton"></div>
+        <div class="product-body">
+          <span class="skeleton sk-line" style="width:40%"></span>
+          <span class="skeleton sk-line sk-line--lg" style="width:88%"></span>
+          <span class="skeleton sk-line" style="width:56%"></span>
+          <div class="product-foot">
+            <span class="skeleton sk-line sk-line--lg" style="width:46%"></span>
+            <span class="skeleton sk-btn"></span>
+          </div>
+        </div>
+      </div>`;
     }
   };
 
@@ -655,7 +560,7 @@
       dot.className = "fly-dot";
       dot.style.left = "0px";
       dot.style.top = "0px";
-      dot.innerHTML = ProductArt.render(product.art);
+      dot.innerHTML = ProductCardView.photo(product, "", false);
       document.body.append(dot);
       const animation = dot.animate(
         [
@@ -754,6 +659,13 @@
   };
 
   // src/models/enums.ts
+  var PetType = /* @__PURE__ */ ((PetType3) => {
+    PetType3["Kucing"] = "kucing";
+    PetType3["Anjing"] = "anjing";
+    PetType3["Burung"] = "burung";
+    PetType3["Ikan"] = "ikan";
+    return PetType3;
+  })(PetType || {});
   var Category = /* @__PURE__ */ ((Category2) => {
     Category2["Makanan"] = "makanan";
     Category2["Camilan"] = "camilan";
@@ -793,7 +705,7 @@
     timeline;
     constructor(dto, lines) {
       this.id = dto.id;
-      this.status = dto.status;
+      this.status = String(dto.status).toLowerCase();
       this.courier = dto.courier;
       this.trackingNumber = dto.resi;
       this.eta = dto.eta;
@@ -1110,7 +1022,7 @@
       const { product } = line;
       const name = escapeHtml(product.name);
       return `
-      <div class="cart-thumb" style="--tint:${product.tint}">${ProductArt.render(product.art)}</div>
+      <div class="cart-thumb">${ProductCardView.photo(product)}</div>
       <div>
         <p class="cart-name">${name}</p>
         <p class="cart-unit">${Formatter.rupiah(product.price)} \xB7 retur ${product.returnWindowDays} hari</p>
@@ -1268,7 +1180,7 @@
     catalog;
     navigator;
     trigger;
-    static POPULAR = ["Salmon", "Kasur", "Pasir", "Catnip", "Camilan"];
+    static POPULAR = ["Anjing", "Burung", "Ikan", "Pelet", "Kasur", "Camilan"];
     input;
     results;
     get initialFocus() {
@@ -1336,10 +1248,10 @@
     static resultHTML(product, query, index) {
       return `
       <button type="button" class="search-result" data-result="${product.id}" style="animation-delay:${index * 30}ms">
-        <span class="search-thumb" style="--tint:${product.tint}">${ProductArt.render(product.art)}</span>
+        <span class="search-thumb">${ProductCardView.photo(product)}</span>
         <span>
           <span class="search-result-name">${_SearchPanel.highlight(product.name, query)}</span>
-          <span class="search-result-meta">${product.categoryLabel} \xB7 ${Formatter.rupiah(product.price)}</span>
+          <span class="search-result-meta">${product.pet.label} \xB7 ${product.categoryLabel} \xB7 ${Formatter.rupiah(product.price)}</span>
         </span>
       </button>`;
     }
@@ -1527,7 +1439,6 @@
     }
     /** Jalankan komponen bersama, lalu komponen khusus halaman. */
     start(page) {
-      ProductArt.hydrate();
       const year = $("[data-year]");
       if (year) year.textContent = String((/* @__PURE__ */ new Date()).getFullYear());
       this.mountSharedComponents();
@@ -1569,7 +1480,7 @@
 
   // src/config.ts
   var config = {
-    useApi: true,
+    useApi: false,
     apiBaseUrl: "http://localhost:5000/api"
   };
 
@@ -1977,7 +1888,7 @@
       }).join("");
       const itemsHTML = order.lines.map((line) => `
       <li class="track-item">
-        <span class="track-thumb" style="--tint:${line.product.tint}">${ProductArt.render(line.product.art)}</span>
+        <span class="track-thumb">${ProductCardView.photo(line.product)}</span>
         <p class="track-item-name">${escapeHtml(line.product.name)}<span>${line.quantity} \xD7 ${Formatter.rupiah(line.product.price)}</span></p>
         <p class="track-item-price">${Formatter.rupiah(line.total)}</p>
       </li>`).join("");
@@ -2305,76 +2216,90 @@
     }
   };
 
-  // src/ui/ProductCardView.ts
-  var BADGE_CLASS = { sale: "badge", new: "badge badge--new", hot: "badge badge--hot" };
-  var ProductCardView = class {
-    constructor() {
+  // src/models/Pet.ts
+  var Pet = class _Pet {
+    constructor(type, label, icon) {
+      this.type = type;
+      this.label = label;
+      this.icon = icon;
     }
-    static render(product, options) {
-      const { wished, index } = options;
-      const name = escapeHtml(product.name);
-      const badge = product.getBadge();
-      return `
-      <article class="product-card is-entering" data-id="${product.id}" style="--d:${Math.min(index * 40, 300)}ms">
-        <div class="product-media" style="--tint:${product.tint}">
-          ${badge ? `<span class="${BADGE_CLASS[badge.variant]}">${escapeHtml(badge.label)}</span>` : ""}
-          <button class="wish-btn" type="button" data-wish="${product.id}" aria-pressed="${wished}"
-            aria-label="${wished ? "Hapus dari" : "Simpan ke"} favorit: ${name}">
-            <svg class="icon"><use href="#i-heart"/></svg>
-          </button>
-          <div class="product-art">${ProductArt.render(product.art)}</div>
-        </div>
-        <div class="product-body">
-          <p class="product-cat">${product.categoryLabel}</p>
-          <h3 class="product-name">${name}</h3>
-          <p class="product-rating">
-            <svg class="icon icon--fill"><use href="#i-star"/></svg>
-            ${Formatter.decimal(product.rating, 1)} <span>(${Formatter.compact(product.reviews)} ulasan)</span>
-          </p>
-          <div class="product-foot">
-            <p class="price">
-              <strong>${Formatter.rupiah(product.price)}</strong>${product.oldPrice ? `<s>${Formatter.rupiah(product.oldPrice)}</s>` : ""}
-            </p>
-            <button class="add-btn" type="button" data-add="${product.id}" aria-label="Tambah ke keranjang: ${name}">
-              <svg class="icon"><use href="#i-bag-plus"/></svg>
-            </button>
-          </div>
-        </div>
-      </article>`;
+    type;
+    label;
+    icon;
+    static registry = /* @__PURE__ */ new Map();
+    static Kucing = _Pet.register("kucing" /* Kucing */, "Kucing", "i-cat");
+    static Anjing = _Pet.register("anjing" /* Anjing */, "Anjing", "i-dog");
+    static Burung = _Pet.register("burung" /* Burung */, "Burung", "i-bird");
+    static Ikan = _Pet.register("ikan" /* Ikan */, "Ikan", "i-fish");
+    static register(type, label, icon) {
+      const pet = new _Pet(type, label, icon);
+      _Pet.registry.set(type, pet);
+      return pet;
     }
-    static skeleton() {
-      return `
-      <div class="product-card is-skeleton" aria-hidden="true">
-        <div class="product-media skeleton"></div>
-        <div class="product-body">
-          <span class="skeleton sk-line" style="width:40%"></span>
-          <span class="skeleton sk-line sk-line--lg" style="width:88%"></span>
-          <span class="skeleton sk-line" style="width:56%"></span>
-          <div class="product-foot">
-            <span class="skeleton sk-line sk-line--lg" style="width:46%"></span>
-            <span class="skeleton sk-btn"></span>
-          </div>
-        </div>
-      </div>`;
+    static isPetType(value) {
+      return _Pet.registry.has(value);
+    }
+    /** Ubah teks dari backend ("Anjing", "anjing") menjadi objek Pet. */
+    static from(value, fallback = _Pet.Kucing) {
+      const key = String(value ?? "").trim().toLowerCase();
+      return _Pet.isPetType(key) ? _Pet.registry.get(key) ?? fallback : fallback;
+    }
+    /** Foto cadangan bila produk belum punya foto sendiri. */
+    get photo() {
+      return `assets/images/pets/${this.type}.jpg`;
+    }
+  };
+
+  // src/models/ProductFilter.ts
+  var CATEGORIES = Object.values(Category);
+  var ProductFilter = class _ProductFilter {
+    constructor(pet = "semua", category = "semua") {
+      this.pet = pet;
+      this.category = category;
+    }
+    pet;
+    category;
+    static ALL = new _ProductFilter();
+    static isPetFilter(value) {
+      return value === "semua" || value === "favorit" || Pet.isPetType(value);
+    }
+    static isCategoryFilter(value) {
+      return value === "semua" || CATEGORIES.includes(value);
+    }
+    withPet(pet) {
+      return new _ProductFilter(pet, this.category);
+    }
+    withCategory(category) {
+      return new _ProductFilter(this.pet, category);
+    }
+    equals(other) {
+      return this.pet === other.pet && this.category === other.category;
+    }
+    /** Apakah produk lolos filter ini? `isFavorite` dipakai untuk filter "favorit". */
+    matches(product, isFavorite) {
+      if (this.pet === "favorit" && !isFavorite(product.id)) return false;
+      if (this.pet !== "semua" && this.pet !== "favorit" && product.pet.type !== this.pet) return false;
+      if (this.category !== "semua" && product.category !== this.category) return false;
+      return true;
     }
   };
 
   // src/ui/ProductGrid.ts
-  var FILTERS = ["semua", "favorit", ...Object.values(Category)];
   var ProductGrid = class _ProductGrid extends Component {
     constructor(root, deps) {
       super(root);
       this.deps = deps;
       this.section = root.closest("section");
-      this.tabsWrap = $("[data-filter-tabs]");
-      this.tabs = this.tabsWrap ? $$("[data-filter]", this.tabsWrap) : [];
+      this.tabsWrap = $("[data-pet-tabs]");
+      this.tabs = this.tabsWrap ? $$("[data-pet]", this.tabsWrap) : [];
+      this.chips = $$("[data-category-chips] [data-category]");
       this.indicator = $("[data-filter-indicator]");
       this.loadMoreButton = $("[data-load-more]");
       this.loadMoreCount = $("[data-load-more-count]");
     }
     deps;
     static PAGE_SIZE = 8;
-    filter = "semua";
+    filter = ProductFilter.ALL;
     visible = _ProductGrid.PAGE_SIZE;
     rendered = false;
     loading = null;
@@ -2382,6 +2307,7 @@
     section;
     tabsWrap;
     tabs;
+    chips;
     indicator;
     loadMoreButton;
     loadMoreCount;
@@ -2390,63 +2316,82 @@
       this.root.id = "produk-grid";
       this.tabs.forEach((tab, i) => {
         tab.setAttribute("aria-controls", this.root.id);
-        tab.addEventListener("click", () => this.setFilter(tab.dataset.filter));
+        tab.addEventListener("click", () => this.selectPet(tab.dataset.pet));
         tab.addEventListener("keydown", (event) => {
           if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
           event.preventDefault();
           const next = this.tabs[(i + (event.key === "ArrowRight" ? 1 : -1) + this.tabs.length) % this.tabs.length];
           next.focus();
-          this.setFilter(next.dataset.filter);
+          this.selectPet(next.dataset.pet);
         });
       });
+      this.chips.forEach(
+        (chip) => chip.addEventListener("click", () => this.setFilter(this.filter.withCategory(chip.dataset.category)))
+      );
       $$("[data-filter-link]").forEach(
         (link) => link.addEventListener("click", () => {
-          this.setFilter(link.dataset.filterLink);
+          this.applyLink(link.dataset.filterLink ?? "");
           void this.load();
         })
       );
       this.loadMoreButton?.addEventListener("click", () => this.loadMore());
       this.root.addEventListener("click", (event) => this.handleClick(event));
       this.root.addEventListener("animationend", (event) => {
-        const target = event.target;
-        target.classList.remove("is-entering", "is-flash");
+        event.target.classList.remove("is-entering", "is-flash");
       });
+      this.deps.wishlist.subscribe(() => this.syncControls(false));
       new IntersectionObserver(([entry], observer) => {
         if (!entry.isIntersecting) return;
         observer.disconnect();
         void this.load();
       }, { rootMargin: "0px 0px -10% 0px" }).observe(this.root);
-      this.syncTabs(false);
+      this.syncControls(false);
     }
     measure() {
-      this.syncTabs(false);
+      this.syncControls(false);
     }
-    /** Tautan dari halaman lain: ?kategori=mainan atau ?produk=p01 */
+    /** Tautan dari halaman lain: ?hewan=anjing, ?kategori=mainan, ?produk=p01 */
     applyUrlParams(params) {
+      const hewan = params.get("hewan");
       const kategori = params.get("kategori");
       const produk = params.get("produk");
-      if (kategori && _ProductGrid.isFilter(kategori)) {
-        this.filter = kategori;
-        this.syncTabs(false);
-      }
+      let filter = ProductFilter.ALL;
+      if (hewan && ProductFilter.isPetFilter(hewan)) filter = filter.withPet(hewan);
+      if (kategori === "favorit") filter = filter.withPet("favorit");
+      else if (kategori && ProductFilter.isCategoryFilter(kategori)) filter = filter.withCategory(kategori);
+      this.filter = filter;
+      this.syncControls(false);
       if (produk) window.setTimeout(() => this.showProduct(produk), 300);
-      if (kategori || produk) history.replaceState(null, "", location.pathname + location.hash);
+      if (hewan || kategori || produk) history.replaceState(null, "", location.pathname + location.hash);
     }
     /* ==================== IProductNavigator ==================== */
     showProduct(productId) {
       void this.revealProduct(productId);
     }
     showFavorites() {
-      this.setFilter("favorit");
+      this.setFilter(new ProductFilter("favorit"));
       void this.load();
       this.section?.scrollIntoView({ behavior: Motion.scrollBehavior });
     }
     /* ==================== filter & render ==================== */
+    /** "kucing" -> filter hewan, "mainan" -> filter kategori (dari semua hewan). */
+    applyLink(value) {
+      if (ProductFilter.isPetFilter(value)) this.setFilter(new ProductFilter(value));
+      else if (ProductFilter.isCategoryFilter(value)) this.setFilter(new ProductFilter("semua", value));
+    }
+    /** Ganti hewan; bila kategori terpilih kosong untuk hewan itu, kembali ke semua kategori. */
+    selectPet(pet) {
+      let next = this.filter.withPet(pet);
+      if (this.deps.catalog.isLoaded && next.category !== "semua" && this.count(next) === 0) {
+        next = next.withCategory("semua");
+      }
+      this.setFilter(next);
+    }
     setFilter(filter) {
-      if (filter === this.filter && this.rendered) return;
+      if (filter.equals(this.filter) && this.rendered) return;
       this.filter = filter;
       this.visible = _ProductGrid.PAGE_SIZE;
-      this.syncTabs(true);
+      this.syncControls(true);
       if (!this.rendered) return;
       if (Motion.reduced) {
         this.render();
@@ -2467,25 +2412,26 @@
       }
       this.loading = this.deps.catalog.load().then(() => {
         this.rendered = true;
+        this.syncControls(false);
         this.render();
       }).catch(() => {
-        this.root.innerHTML = _ProductGrid.errorHTML();
+        this.root.innerHTML = _ProductGrid.stateHTML("Gagal memuat produk", "Sepertinya koneksi sedang bermasalah. Coba muat ulang.", "i-alert", '<button class="btn btn-primary btn-sm" type="button" data-retry>Coba lagi</button>');
         this.root.setAttribute("aria-busy", "false");
       }).finally(() => {
         this.loading = null;
       });
       return this.loading;
     }
-    /** Produk yang lolos filter aktif. Memakai getter `category` milik tiap objek. */
-    filtered() {
-      const all = this.deps.catalog.all;
-      if (this.filter === "semua") return [...all];
-      if (this.filter === "favorit") return all.filter((product) => this.deps.wishlist.has(product.id));
-      return all.filter((product) => product.category === this.filter);
+    isFavorite = (productId) => this.deps.wishlist.has(productId);
+    filtered(filter = this.filter) {
+      return this.deps.catalog.all.filter((product) => filter.matches(product, this.isFavorite));
+    }
+    count(filter) {
+      return this.filtered(filter).length;
     }
     render(animate = true) {
       const list = this.filtered();
-      this.root.innerHTML = list.length ? list.slice(0, this.visible).map((product, index) => ProductCardView.render(product, { wished: this.deps.wishlist.has(product.id), index })).join("") : this.emptyHTML();
+      this.root.innerHTML = list.length ? list.slice(0, this.visible).map((product, index) => ProductCardView.render(product, { wished: this.isFavorite(product.id), index })).join("") : this.emptyHTML();
       if (!animate) this.root.querySelectorAll(".product-card").forEach((card) => card.classList.remove("is-entering"));
       this.root.setAttribute("aria-busy", "false");
       this.updateLoadMore(list);
@@ -2494,7 +2440,7 @@
       const list = this.filtered();
       const start = this.visible;
       this.visible += _ProductGrid.PAGE_SIZE;
-      const html = list.slice(start, this.visible).map((product, index) => ProductCardView.render(product, { wished: this.deps.wishlist.has(product.id), index })).join("");
+      const html = list.slice(start, this.visible).map((product, index) => ProductCardView.render(product, { wished: this.isFavorite(product.id), index })).join("");
       this.root.insertAdjacentHTML("beforeend", html);
       this.updateLoadMore(list);
     }
@@ -2508,9 +2454,9 @@
       await this.load();
       let index = this.filtered().findIndex((product) => product.id === productId);
       if (index === -1) {
-        this.filter = "semua";
-        this.syncTabs(true);
-        index = this.deps.catalog.all.findIndex((product) => product.id === productId);
+        this.filter = ProductFilter.ALL;
+        this.syncControls(true);
+        index = this.filtered().findIndex((product) => product.id === productId);
       }
       if (index === -1) return;
       const size = _ProductGrid.PAGE_SIZE;
@@ -2521,14 +2467,25 @@
       card.scrollIntoView({ behavior: Motion.scrollBehavior, block: "center" });
       restartAnimation(card, "is-flash");
     }
-    /* ==================== tab filter ==================== */
-    syncTabs(scrollTab) {
+    /* ==================== tab hewan & chip kategori ==================== */
+    syncControls(scrollTab) {
       this.tabs.forEach((tab) => {
-        const on = tab.dataset.filter === this.filter;
+        const on = tab.dataset.pet === this.filter.pet;
         tab.setAttribute("aria-selected", String(on));
         tab.tabIndex = on ? 0 : -1;
       });
-      const active = this.tabs.find((tab) => tab.dataset.filter === this.filter);
+      const loaded = this.deps.catalog.isLoaded;
+      this.chips.forEach((chip) => {
+        const category = chip.dataset.category;
+        const on = category === this.filter.category;
+        chip.setAttribute("aria-pressed", String(on));
+        const counter = chip.querySelector(".chip-count");
+        if (!loaded || !counter) return;
+        const total = this.count(this.filter.withCategory(category));
+        counter.textContent = String(total);
+        chip.disabled = total === 0 && !on;
+      });
+      const active = this.tabs.find((tab) => tab.dataset.pet === this.filter.pet);
       if (!active || !this.indicator || !this.tabsWrap) return;
       this.indicator.style.setProperty("--x", `${active.offsetLeft}px`);
       this.indicator.style.setProperty("--w", `${active.offsetWidth}px`);
@@ -2545,7 +2502,7 @@
       if (wishButton?.dataset.wish) this.toggleWish(wishButton.dataset.wish, wishButton);
       else if (addButton?.dataset.add) this.addToCart(addButton.dataset.add, addButton);
       else if (target.closest("[data-retry]")) void this.load();
-      else if (target.closest("[data-go-all]")) this.setFilter("semua");
+      else if (target.closest("[data-go-all]")) this.setFilter(ProductFilter.ALL);
     }
     toggleWish(productId, button) {
       const product = this.deps.catalog.find(productId);
@@ -2556,14 +2513,17 @@
       restartAnimation(button, "is-pop");
       if (added) {
         this.deps.notifier.notify(`${product.name} disimpan ke favorit`, { action: "Lihat", onAction: () => this.showFavorites() });
-      } else if (this.filter === "favorit") {
+      } else if (this.filter.pet === "favorit") {
         window.setTimeout(() => this.render(false), 300);
       }
     }
     addToCart(productId, button) {
       const product = this.deps.catalog.find(productId);
       if (!product) return;
-      this.deps.cart.add(productId);
+      if (!this.deps.cart.add(productId)) {
+        this.deps.notifier.notify(`${product.name} sedang habis. Coba lagi nanti, ya.`, { type: "error" });
+        return;
+      }
       button.classList.add("is-added");
       button.innerHTML = '<svg class="icon"><use href="#i-check"/></svg>';
       window.clearTimeout(this.resetTimers.get(button));
@@ -2580,34 +2540,20 @@
     }
     /* ==================== state kosong / galat ==================== */
     emptyHTML() {
-      if (this.filter === "favorit") {
-        return `
-        <div class="grid-state">
-          <div class="grid-state-art">${ProductArt.render({ type: "bed", palette: "cream" })}</div>
-          <h3>Belum ada favorit</h3>
-          <p>Ketuk ikon hati di produk mana pun untuk menyimpannya di sini.</p>
-          <button class="btn btn-ghost btn-sm" type="button" data-go-all>Lihat semua produk</button>
-        </div>`;
+      const allButton = '<button class="btn btn-ghost btn-sm" type="button" data-go-all>Lihat semua produk</button>';
+      if (this.filter.pet === "favorit") {
+        return _ProductGrid.stateHTML("Belum ada favorit", "Ketuk ikon hati di produk mana pun untuk menyimpannya di sini.", "i-heart", allButton);
       }
-      return `
-      <div class="grid-state">
-        <div class="grid-state-art">${ProductArt.render({ type: "yarn", palette: "orange" })}</div>
-        <h3>Stok sedang diisi ulang</h3>
-        <p>Kategori ini belum punya produk. Cek lagi nanti, ya.</p>
-        <button class="btn btn-ghost btn-sm" type="button" data-go-all>Lihat semua produk</button>
-      </div>`;
+      return _ProductGrid.stateHTML("Belum ada produk di sini", "Kombinasi hewan dan kategori ini sedang kosong. Coba kategori lain, ya.", "i-paw", allButton);
     }
-    static errorHTML() {
+    static stateHTML(title, text, icon, action) {
       return `
-      <div class="grid-state" role="alert">
-        <div class="grid-state-art">${ProductArt.render({ type: "mouse", palette: "brown" })}</div>
-        <h3>Gagal memuat produk</h3>
-        <p>Sepertinya koneksi sedang bermasalah. Coba muat ulang.</p>
-        <button class="btn btn-primary btn-sm" type="button" data-retry>Coba lagi</button>
+      <div class="grid-state" role="${icon === "i-alert" ? "alert" : "status"}">
+        <span class="grid-state-icon"><svg class="icon ${icon === "i-paw" ? "icon--fill" : ""}"><use href="#${icon}"/></svg></span>
+        <h3>${title}</h3>
+        <p>${text}</p>
+        ${action}
       </div>`;
-    }
-    static isFilter(value) {
-      return FILTERS.includes(value);
     }
   };
 
@@ -2670,10 +2616,13 @@
     name;
     rating;
     reviews;
-    art;
-    tint;
+    /** Jenis hewan (COMPOSITION: Product "memiliki" Pet) */
+    pet;
+    image;
     _price;
     _oldPrice;
+    /** null = stok tidak dilacak (selalu tersedia) */
+    _stock;
     badgeText;
     constructor(dto) {
       if (dto.price < 0) throw new Error(`Harga produk ${dto.id} tidak boleh negatif.`);
@@ -2681,10 +2630,11 @@
       this.name = dto.name;
       this.rating = dto.rating;
       this.reviews = dto.reviews;
-      this.art = dto.art;
-      this.tint = dto.tint;
+      this.pet = Pet.from(dto.pet);
+      this.image = dto.image || this.pet.photo;
       this._price = dto.price;
       this._oldPrice = dto.oldPrice ?? null;
+      this._stock = dto.stock ?? null;
       this.badgeText = dto.badge ?? null;
     }
     /* ---------- getter (ENCAPSULATION) ---------- */
@@ -2701,18 +2651,22 @@
       if (!this.isOnSale || this._oldPrice === null) return 0;
       return Math.round((1 - this._price / this._oldPrice) * 100);
     }
+    get isAvailable() {
+      return this._stock === null || this._stock > 0;
+    }
     /* ---------- perilaku bersama ---------- */
-    /** Badge di kartu produk: diskon diutamakan, lalu label dari backend. */
+    /** Badge di kartu produk: stok habis > diskon > label dari backend. */
     getBadge() {
+      if (!this.isAvailable) return { label: "Stok habis", variant: "out" };
       if (this.isOnSale) return { label: `-${this.discountPercent}%`, variant: "sale" };
       if (this.badgeText === "Baru") return { label: "Baru", variant: "new" };
       if (this.badgeText) return { label: this.badgeText, variant: "hot" };
       return null;
     }
-    /** Dipakai fitur pencarian: cocokkan dengan nama & label kategori. */
+    /** Dipakai fitur pencarian: cocokkan dengan nama, kategori, dan jenis hewan. */
     matches(query) {
       const q = query.trim().toLowerCase();
-      return q.length > 0 && `${this.name} ${this.categoryLabel}`.toLowerCase().includes(q);
+      return q.length > 0 && `${this.name} ${this.categoryLabel} ${this.pet.label}`.toLowerCase().includes(q);
     }
   };
   var FoodProduct = class extends Product {
@@ -2762,7 +2716,7 @@
     constructor() {
     }
     static create(dto) {
-      switch (dto.category) {
+      switch (String(dto.category).trim().toLowerCase()) {
         case "makanan" /* Makanan */:
           return new FoodProduct(dto);
         case "camilan" /* Camilan */:
@@ -2880,19 +2834,33 @@
   };
 
   // src/services/mock/mockData.ts
+  var img = (id) => `assets/images/products/${id}.jpg`;
+  var { Kucing, Anjing, Burung, Ikan } = PetType;
+  var { Makanan, Camilan, Mainan, Perlengkapan } = Category;
   var MOCK_PRODUCTS = [
-    { id: "p01", name: "Salmon Kitten Dry Food 1,5 kg", category: "makanan" /* Makanan */, price: 145e3, oldPrice: 189e3, rating: 4.9, reviews: 1240, art: { type: "bag", palette: "orange" }, tint: "#FFE9D6" },
-    { id: "p02", name: "Tuna P\xE2t\xE9 in Gravy 85 g", category: "makanan" /* Makanan */, price: 18500, rating: 4.8, reviews: 3410, badge: "Terlaris", art: { type: "can", palette: "tangerine" }, tint: "#FFF1CC" },
-    { id: "p03", name: "Chicken Crunch Treats 60 g", category: "camilan" /* Camilan */, price: 32e3, oldPrice: 4e4, rating: 4.8, reviews: 2120, art: { type: "pouch", palette: "rust" }, tint: "#FDE5DC" },
-    { id: "p04", name: "Tikus Plush Isi Catnip", category: "mainan" /* Mainan */, price: 25e3, rating: 4.9, reviews: 980, art: { type: "mouse", palette: "brown" }, tint: "#F6ECE1" },
-    { id: "p05", name: "Menara Garukan Sisal 60 cm", category: "perlengkapan" /* Perlengkapan */, price: 289e3, oldPrice: 349e3, rating: 4.8, reviews: 720, art: { type: "scratcher", palette: "brown" }, tint: "#FFE9D6" },
-    { id: "p06", name: "Kasur Donat Fluffy", category: "perlengkapan" /* Perlengkapan */, price: 175e3, rating: 4.9, reviews: 1930, badge: "Terlaris", art: { type: "bed", palette: "cream" }, tint: "#FDE5DC" },
-    { id: "p07", name: "Salmon Bites Dental 80 g", category: "camilan" /* Camilan */, price: 29e3, rating: 4.6, reviews: 540, badge: "Baru", art: { type: "pouch", palette: "honey" }, tint: "#FFF1CC" },
-    { id: "p08", name: "Pasir Gumpal Lavender 10 L", category: "perlengkapan" /* Perlengkapan */, price: 89e3, oldPrice: 105e3, rating: 4.8, reviews: 2710, art: { type: "litter", palette: "honey" }, tint: "#F6ECE1" },
-    { id: "p09", name: "Adult Indoor Chicken 2 kg", category: "makanan" /* Makanan */, price: 168e3, rating: 4.7, reviews: 860, art: { type: "bag", palette: "brown" }, tint: "#F6ECE1" },
-    { id: "p10", name: "Tongkat Bulu Interaktif", category: "mainan" /* Mainan */, price: 35e3, oldPrice: 45e3, rating: 4.7, reviews: 1500, art: { type: "wand", palette: "rust" }, tint: "#FFE9D6" },
-    { id: "p11", name: "Air Mancur Minum 2 L", category: "perlengkapan" /* Perlengkapan */, price: 219e3, rating: 4.7, reviews: 650, badge: "Baru", art: { type: "fountain", palette: "cream" }, tint: "#FDE5DC" },
-    { id: "p12", name: "Bola Benang Wol Isi 3", category: "mainan" /* Mainan */, price: 15e3, rating: 4.5, reviews: 410, art: { type: "yarn", palette: "orange" }, tint: "#FFF1CC" }
+    { id: "p01", pet: Kucing, category: Makanan, name: "Makanan Kering Kitten Salmon 1,5 kg", price: 145e3, oldPrice: 189e3, rating: 4.9, reviews: 1240, stock: 32, image: img("p01") },
+    { id: "p07", pet: Anjing, category: Makanan, name: "Makanan Kering Anjing Dewasa 3 kg", price: 189e3, oldPrice: 229e3, rating: 4.8, reviews: 980, stock: 25, image: img("p07") },
+    { id: "p14", pet: Burung, category: Makanan, name: "Pakan Biji Campur Lovebird 1 kg", price: 38e3, rating: 4.8, reviews: 1340, badge: "Terlaris", stock: 140, image: img("p14") },
+    { id: "p19", pet: Ikan, category: Makanan, name: "Pelet Ikan Hias Tropis 100 g", price: 25e3, rating: 4.8, reviews: 1890, badge: "Terlaris", stock: 200, image: img("p19") },
+    { id: "p09", pet: Anjing, category: Camilan, name: "Biskuit Tulang Keju & Bacon 500 g", price: 45e3, rating: 4.9, reviews: 1820, badge: "Terlaris", stock: 55, image: img("p09") },
+    { id: "p03", pet: Kucing, category: Camilan, name: "Camilan Creamy Tuna isi 4", price: 32e3, oldPrice: 4e4, rating: 4.8, reviews: 2120, stock: 85, image: img("p03") },
+    { id: "p20", pet: Ikan, category: Makanan, name: "Pelet Koi Pewarna 1 kg", price: 78e3, oldPrice: 92e3, rating: 4.8, reviews: 760, stock: 50, image: img("p20") },
+    { id: "p10", pet: Anjing, category: Mainan, name: "Boneka Gajah Squeaky", price: 59e3, rating: 4.8, reviews: 760, stock: 30, image: img("p10") },
+    { id: "p05", pet: Kucing, category: Perlengkapan, name: "Kasur Donat Fluffy", price: 175e3, rating: 4.9, reviews: 1930, badge: "Terlaris", stock: 18, image: img("p05") },
+    { id: "p15", pet: Burung, category: Camilan, name: "Millet Tangkai 250 g", price: 22e3, rating: 4.7, reviews: 620, stock: 90, image: img("p15") },
+    { id: "p02", pet: Kucing, category: Makanan, name: "Makanan Basah Kucing Tuna 400 g", price: 28500, rating: 4.8, reviews: 3410, badge: "Terlaris", stock: 120, image: img("p02") },
+    { id: "p11", pet: Anjing, category: Mainan, name: "Mainan Tulang Karet Anti Gigit", price: 69e3, oldPrice: 85e3, rating: 4.7, reviews: 530, stock: 22, image: img("p11") },
+    { id: "p23", pet: Ikan, category: Perlengkapan, name: "Akuarium Set 60 cm + Lampu LED", price: 689e3, oldPrice: 799e3, rating: 4.9, reviews: 180, stock: 7, image: img("p23") },
+    { id: "p16", pet: Burung, category: Camilan, name: "Biji Bunga Matahari 500 g", price: 27e3, oldPrice: 32e3, rating: 4.6, reviews: 480, stock: 75, image: img("p16") },
+    { id: "p13", pet: Anjing, category: Perlengkapan, name: "Kasur Anjing Ortopedi Ukuran M", price: 329e3, oldPrice: 389e3, rating: 4.9, reviews: 690, stock: 9, image: img("p13") },
+    { id: "p04", pet: Kucing, category: Mainan, name: "Tongkat Bulu Interaktif", price: 35e3, oldPrice: 45e3, rating: 4.7, reviews: 1500, stock: 40, image: img("p04") },
+    { id: "p21", pet: Ikan, category: Camilan, name: "Udang Kering Premium 200 g", price: 35e3, rating: 4.7, reviews: 390, stock: 65, image: img("p21") },
+    { id: "p06", pet: Kucing, category: Perlengkapan, name: "Pasir Kayu Pinus 10 L", price: 89e3, oldPrice: 105e3, rating: 4.8, reviews: 2710, stock: 60, image: img("p06") },
+    { id: "p08", pet: Anjing, category: Makanan, name: "Makanan Basah Anjing Chicken Stew", price: 32e3, rating: 4.7, reviews: 640, badge: "Baru", stock: 70, image: img("p08") },
+    { id: "p17", pet: Burung, category: Perlengkapan, name: "Sangkar Burung Bulat Antik", price: 245e3, rating: 4.8, reviews: 210, stock: 6, image: img("p17") },
+    { id: "p12", pet: Anjing, category: Perlengkapan, name: "Tali Tuntun Nilon 1,5 m", price: 55e3, rating: 4.6, reviews: 410, stock: 48, image: img("p12") },
+    { id: "p18", pet: Burung, category: Perlengkapan, name: "Tempat Pakan Gantung Anti Tumpah", price: 49e3, rating: 4.5, reviews: 330, badge: "Baru", stock: 40, image: img("p18") },
+    { id: "p22", pet: Ikan, category: Perlengkapan, name: "Akuarium Bulat 5 L", price: 129e3, rating: 4.6, reviews: 270, badge: "Baru", stock: 0, image: img("p22") }
   ];
   var MOCK_ORDERS = [
     {
@@ -2903,7 +2871,7 @@
       resi: null,
       eta: "Jumat, 7 Nov 2026",
       address: "Jl. Me**** No. 12, Jakarta Timur",
-      items: [{ productId: "p01", qty: 1 }, { productId: "p08", qty: 2 }],
+      items: [{ productId: "p07", qty: 1 }, { productId: "p06", qty: 2 }],
       timeline: { dibuat: "2026-11-06T09:12:00+07:00", dibayar: "2026-11-06T09:15:00+07:00", dikemas: "2026-11-06T10:40:00+07:00" }
     },
     {
@@ -2914,7 +2882,7 @@
       resi: "JNE0012345678",
       eta: "Sabtu, 8 Nov 2026",
       address: "Jl. Ce***** Raya No. 4, Bandung",
-      items: [{ productId: "p06", qty: 1 }, { productId: "p03", qty: 2 }],
+      items: [{ productId: "p05", qty: 1 }, { productId: "p03", qty: 2 }],
       timeline: { dibuat: "2026-11-04T19:02:00+07:00", dibayar: "2026-11-04T19:09:00+07:00", dikemas: "2026-11-05T08:30:00+07:00", dikirim: "2026-11-05T16:45:00+07:00" }
     },
     {
@@ -2925,7 +2893,7 @@
       resi: "SCP0098765432",
       eta: "Diterima 30 Okt 2026",
       address: "Jl. An***** No. 7, Depok",
-      items: [{ productId: "p02", qty: 6 }, { productId: "p12", qty: 1 }],
+      items: [{ productId: "p19", qty: 3 }, { productId: "p14", qty: 1 }],
       timeline: { dibuat: "2026-10-28T11:20:00+07:00", dibayar: "2026-10-28T11:22:00+07:00", dikemas: "2026-10-28T14:05:00+07:00", dikirim: "2026-10-29T09:10:00+07:00", sampai: "2026-10-30T13:05:00+07:00" }
     }
   ];

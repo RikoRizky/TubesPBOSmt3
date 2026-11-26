@@ -24,7 +24,7 @@ src/
 ├── config.ts               useApi: false/true, alamat backend
 ├── app/App.ts              merakit semua objek bersama (dependency injection)
 ├── pages/                  Page (abstract) → HomePage, HelpPage
-├── models/                 Product (abstract) & turunannya, ProductFactory, Order, enum, DTO
+├── models/                 Product (abstract) & turunannya, Pet, ProductFilter, ProductFactory, Order, enum, DTO
 ├── contracts/              semua interface (IProductRepository, IOrderService, IStorage, ...)
 ├── services/               Cart, Wishlist, ProductCatalog, ProductNavigator
 │   ├── mock/               implementasi interface dengan data contoh
@@ -49,9 +49,11 @@ src/
 | **Polymorphism** | `ScrollEngine` memanggil `effect.update(state)` pada 10 efek berbeda. `product.categoryLabel` dan `product.returnWindowDays` memberi hasil berbeda per jenis produk ("retur 14 hari" vs "30 hari" di keranjang). `NewsletterForm` meng-`override` `showAlert()` |
 | **Interface** | `IProductRepository`, `IOrderService`, `INewsletterService`, `IStorage`, `INotifier`, `IProductNavigator`, `IMeasurable`, `IValidator`. Satu kelas bisa mengimplementasikan dua interface: `ProductGrid implements IProductNavigator, IMeasurable` |
 | **Generics** | `Observable<T>`, `IStorage.read<T>()`, `HttpClient.get<T>()` |
-| **Enum** | `Category`, `OrderStatus`, `ReturnReason` |
-| **Static** | `ProductFactory.create()`, `Formatter.rupiah()`, `Cart.FREE_SHIPPING_MIN` |
-| **Composition** | `FormField` berisi daftar `IValidator`. `LayerManager` menyimpan elemen overlay (karena sudah mewarisi `Observable`) |
+| **Enum** | `PetType`, `Category`, `OrderStatus`, `ReturnReason` |
+| **Static** | `ProductFactory.create()`, `Formatter.rupiah()`, `Cart.FREE_SHIPPING_MIN`, `Pet.Kucing` |
+| **Composition** | `Product` memiliki `Pet` (jenis hewannya). `FormField` berisi daftar `IValidator`. `LayerManager` menyimpan elemen overlay (karena sudah mewarisi `Observable`) |
+| **Value object** | `Pet`: constructor `private`, objeknya hanya ada 4 (`Pet.Kucing`, `Pet.Anjing`, `Pet.Burung`, `Pet.Ikan`), lengkap dengan label & ikon |
+| **Immutable object** | `ProductFilter` (hewan + kategori) tidak pernah diubah; `withPet()` / `withCategory()` selalu membuat objek baru |
 
 ### Design pattern yang dipakai
 
@@ -72,8 +74,12 @@ classDiagram
     <<abstract>>
     +id: string
     +name: string
+    +image: string
+    +pet: Pet
     -_price: number
+    -_stock: number
     +price: number
+    +isAvailable() boolean
     +category()* Category
     +categoryLabel()* string
     +returnWindowDays()* number
@@ -85,6 +91,23 @@ classDiagram
   Product <|-- ToyProduct
   Product <|-- SupplyProduct
   ProductFactory ..> Product : membuat
+
+  class Pet {
+    +type: PetType
+    +label: string
+    +icon: string
+    +from(value)$ Pet
+  }
+  Product --> Pet : memiliki
+
+  class ProductFilter {
+    +pet: PetFilter
+    +category: CategoryFilter
+    +withPet(pet) ProductFilter
+    +withCategory(category) ProductFilter
+    +matches(product, isFavorite) boolean
+  }
+  ProductFilter ..> Product : menyaring
 
   class IProductRepository {
     <<interface>>

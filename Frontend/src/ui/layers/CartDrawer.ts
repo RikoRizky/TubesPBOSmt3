@@ -4,7 +4,7 @@ import { Formatter } from '../../core/Formatter';
 import { Motion } from '../../core/Motion';
 import type { Cart, CartLine } from '../../services/Cart';
 import type { ProductCatalog } from '../../services/ProductCatalog';
-import { ProductArt } from '../ProductArt';
+import { ProductCardView } from '../ProductCardView';
 import { Layer } from './Layer';
 import type { LayerManager } from './LayerManager';
 
@@ -153,7 +153,7 @@ export class CartDrawer extends Layer {
     const name = escapeHtml(product.name);
     // POLYMORPHISM: returnWindowDays berbeda untuk makanan (14) dan lainnya (30)
     return `
-      <div class="cart-thumb" style="--tint:${product.tint}">${ProductArt.render(product.art)}</div>
+      <div class="cart-thumb">${ProductCardView.photo(product)}</div>
       <div>
         <p class="cart-name">${name}</p>
         <p class="cart-unit">${Formatter.rupiah(product.price)} · retur ${product.returnWindowDays} hari</p>

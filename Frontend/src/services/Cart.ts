@@ -38,10 +38,13 @@ export class Cart extends Observable<Cart> {
 
   /* ---------- perintah ---------- */
 
-  add(productId: string, quantity = 1): void {
+  /** Mengembalikan false bila produk sedang habis. */
+  add(productId: string, quantity = 1): boolean {
     if (quantity <= 0) throw new Error('Jumlah yang ditambahkan harus lebih dari 0.');
+    if (this.catalog.find(productId)?.isAvailable === false) return false;
     this.quantities.set(productId, this.quantityOf(productId) + quantity);
     this.commit();
+    return true;
   }
 
   setQuantity(productId: string, quantity: number): void {

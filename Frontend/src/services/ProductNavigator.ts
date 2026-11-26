@@ -7,7 +7,7 @@ export class RedirectNavigator implements IProductNavigator {
   }
 
   showFavorites(): void {
-    location.href = 'index.html?kategori=favorit#belanja';
+    location.href = 'index.html?hewan=favorit#belanja';
   }
 }
 

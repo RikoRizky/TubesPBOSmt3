@@ -45,7 +45,7 @@ export class Order {
 
   constructor(dto: OrderDTO, lines: OrderLine[]) {
     this.id = dto.id;
-    this.status = dto.status;
+    this.status = String(dto.status).toLowerCase() as OrderStatus;
     this.courier = dto.courier;
     this.trackingNumber = dto.resi;
     this.eta = dto.eta;

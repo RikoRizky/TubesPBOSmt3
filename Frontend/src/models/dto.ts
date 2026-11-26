@@ -6,28 +6,22 @@ import type { OrderStatus } from './enums';
  * DTO tidak punya perilaku; perilakunya ada di kelas model (Product, Order).
  */
 
-export type ArtType =
-  | 'bag' | 'can' | 'pouch' | 'mouse' | 'yarn'
-  | 'wand' | 'scratcher' | 'bed' | 'litter' | 'fountain';
-
-export type PaletteName = 'orange' | 'tangerine' | 'brown' | 'honey' | 'rust' | 'cream';
-
-export interface ArtSpec {
-  type: ArtType;
-  palette: PaletteName;
-}
-
 export interface ProductDTO {
   id: string;
   name: string;
+  /** makanan | camilan | mainan | perlengkapan */
   category: string;
+  /** kucing | anjing | burung | ikan (bila kosong dianggap kucing) */
+  pet?: string | null;
   price: number;
-  oldPrice?: number;
+  oldPrice?: number | null;
   rating: number;
   reviews: number;
-  badge?: string;
-  art: ArtSpec;
-  tint: string;
+  badge?: string | null;
+  /** URL foto produk (bila kosong memakai foto jenis hewannya) */
+  image?: string | null;
+  /** sisa stok; bila tidak dikirim dianggap selalu tersedia */
+  stock?: number | null;
 }
 
 export interface OrderItemDTO {

@@ -21,7 +21,6 @@ import { LayerManager } from '../ui/layers/LayerManager';
 import { MobileNav } from '../ui/layers/MobileNav';
 import { SearchPanel } from '../ui/layers/SearchPanel';
 import { PrimaryNav } from '../ui/PrimaryNav';
-import { ProductArt } from '../ui/ProductArt';
 import { RevealOnScroll } from '../ui/RevealOnScroll';
 import { ToastNotifier } from '../ui/ToastNotifier';
 
@@ -79,7 +78,6 @@ export class App {
 
   /** Jalankan komponen bersama, lalu komponen khusus halaman. */
   start(page: Page): void {
-    ProductArt.hydrate();
     const year = $('[data-year]');
     if (year) year.textContent = String(new Date().getFullYear());
 

@@ -773,16 +773,22 @@ button:disabled { cursor: not-allowed; }
 .search-result:focus-visible { background: var(--cream); }
 
 .search-thumb {
-  display: grid;
-  place-items: center;
   width: 52px;
   height: 52px;
   flex-shrink: 0;
+  overflow: hidden;
   border-radius: 10px;
-  background: var(--tint, var(--peach));
+  background: var(--sand);
 }
 
-.search-thumb svg { width: 88%; }
+/* foto produk kecil (pencarian, keranjang, lacak pesanan, titik terbang) */
+.search-thumb img,
+.cart-thumb img,
+.fly-dot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
 .search-result-name,
 .search-result-meta { display: block; }
@@ -921,15 +927,12 @@ button:disabled { cursor: not-allowed; }
 }
 
 .cart-thumb {
-  display: grid;
-  place-items: center;
   width: 64px;
   height: 64px;
+  overflow: hidden;
   border-radius: var(--radius-md);
-  background: var(--tint, var(--peach));
+  background: var(--sand);
 }
-
-.cart-thumb svg { width: 84%; }
 
 .cart-name {
   display: -webkit-box;
@@ -1027,9 +1030,14 @@ button:disabled { cursor: not-allowed; }
 
 .cart-empty.is-visible { display: flex; }
 
-.cart-empty-art {
-  width: 160px;
+.cart-empty-photo {
+  width: 144px;
+  height: 144px;
   margin-bottom: 8px;
+  border: 6px solid var(--white);
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: var(--shadow-md);
 }
 
 .cart-empty h3 {
@@ -1270,16 +1278,34 @@ button:disabled { cursor: not-allowed; }
   top: 22%;
 }
 
-.float-card-art {
-  display: grid;
-  place-items: center;
+.float-card-photo {
   width: 48px;
   height: 48px;
   border-radius: var(--radius-md);
-  background: var(--peach);
+  object-fit: cover;
 }
 
-.float-card-art svg { width: 90%; }
+/* kartu "4 sahabat": foto bulat bertumpuk */
+.float-card--pets {
+  top: 6%;
+  left: -2%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 10px 14px 10px 10px;
+}
+
+.pet-avatars { display: flex; }
+
+.pet-avatars li + li { margin-left: -10px; }
+
+.pet-avatars img {
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--white);
+  border-radius: 50%;
+  object-fit: cover;
+}
 
 .float-card-icon {
   display: grid;
@@ -1327,8 +1353,8 @@ button:disabled { cursor: not-allowed; }
 }
 
 .hero-paw--1 {
-  top: 6%;
-  left: 4%;
+  top: 44%;
+  left: 2%;
   width: 40px;
   height: 40px;
   rotate: -24deg;
@@ -1464,10 +1490,11 @@ button:disabled { cursor: not-allowed; }
 
 .category { padding-top: clamp(80px, 10vw, 136px); }
 
-.category-list {
+/* kartu jenis hewan: foto penuh + teks di atas gradasi */
+.pet-list {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(160px, 44%);
+  grid-auto-columns: minmax(200px, 62%);
   gap: 16px;
   margin-inline: -16px;
   padding: 4px 16px 16px;
@@ -1477,77 +1504,102 @@ button:disabled { cursor: not-allowed; }
   scrollbar-width: none;
 }
 
-.category-list::-webkit-scrollbar { display: none; }
+.pet-list::-webkit-scrollbar { display: none; }
 
-.category-card {
+.pet-card {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 12px 12px 16px;
-  background: var(--tint);
-  border: 1px solid rgba(43, 27, 18, 0.04);
-  border-radius: var(--radius-lg);
+  display: block;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--sand);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
   scroll-snap-align: start;
   transition:
     transform 300ms var(--ease-out),
     box-shadow 300ms var(--ease-out);
 }
 
-.category-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
+.pet-card img {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: scale 700ms var(--ease-out);
 }
 
-.category-card:active {
+.pet-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(43, 27, 18, 0) 40%, rgba(43, 27, 18, 0.78) 100%);
+}
+
+.pet-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.pet-card:hover img { scale: 1.06; }
+
+.pet-card:active {
   transform: translateY(-1px) scale(0.98);
   transition-duration: 100ms;
 }
 
-.category-art {
-  display: grid;
-  place-items: center;
-  aspect-ratio: 1;
-  margin-bottom: 8px;
-}
-
-.category-art svg {
-  width: 76%;
-  transition: transform 500ms var(--ease-spring);
-}
-
-.category-card:hover .category-art svg {
-  transform: translateY(-6px) rotate(-6deg) scale(1.05);
-}
-
-.category-name {
-  padding-inline: 4px;
-  color: var(--ink);
-  font-family: var(--ff-display);
-  font-size: 1.0625rem;
-  font-weight: 600;
-  line-height: 1.25;
-}
-
-.category-count {
-  margin-top: 4px;
-  padding-inline: 4px;
-  color: var(--muted);
-  font-size: 0.8125rem;
-}
-
-.category-arrow {
+.pet-card-body {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  justify-items: start;
+  gap: 2px;
+  padding: 20px;
+  color: var(--white);
+}
+
+.pet-card-icon {
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
+  margin-bottom: 8px;
   border-radius: 10px;
+  background: var(--orange-500);
+  color: var(--white);
+}
+
+.pet-card-name {
+  font-family: var(--ff-display);
+  font-size: 1.625rem;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.pet-card-meta {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.pet-card-arrow {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   background: var(--white);
   color: var(--orange-700);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
   opacity: 0;
   translate: -4px 4px;
   transition:
@@ -1555,14 +1607,14 @@ button:disabled { cursor: not-allowed; }
     translate 300ms var(--ease-out);
 }
 
-.category-arrow .icon {
-  width: 16px;
-  height: 16px;
+.pet-card-arrow .icon {
+  width: 18px;
+  height: 18px;
   rotate: -45deg;
 }
 
-.category-card:hover .category-arrow,
-.category-card:focus-visible .category-arrow {
+.pet-card:hover .pet-card-arrow,
+.pet-card:focus-visible .pet-card-arrow {
   opacity: 1;
   translate: 0 0;
 }
@@ -1656,15 +1708,18 @@ button:disabled { cursor: not-allowed; }
 /* kartu besar: latar putih menyatu dengan foto */
 .offer-card--big {
   grid-template-rows: auto 1fr;
-  background: #FAFBFD;
+  background: var(--white);
   border: 1px solid var(--line);
 }
 
-.offer-card--big .offer-content { padding-bottom: 0; }
+.offer-card--big .offer-content { padding-bottom: 8px; }
 
-.offer-card--big .offer-media { min-height: 240px; }
+.offer-card--big .offer-media {
+  min-height: 240px;
+  margin: 0 8px 8px;
+}
 
-.offer-card--big .offer-media img { object-position: 50% 78%; }
+.offer-card--big .offer-media img { object-position: 50% 45%; }
 
 /* kartu mainan: foto dibingkai */
 .offer-card--toys {
@@ -1707,6 +1762,64 @@ button:disabled { cursor: not-allowed; }
 \*-----------------------------------*/
 
 .product { background: var(--cream); }
+
+.product .section-head { margin-bottom: 24px; }
+
+.filter-bar {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+/* HP: satu baris yang bisa digeser; layar lebar: boleh turun baris */
+.category-chips {
+  display: flex;
+  gap: 8px;
+  width: calc(100% + 32px);
+  margin-inline: -16px;
+  padding-inline: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.category-chips::-webkit-scrollbar { display: none; }
+
+.category-chips .chip { flex-shrink: 0; }
+
+.category-chips .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.category-chips .chip[aria-pressed="true"] {
+  background: var(--orange-50);
+  border-color: var(--orange-400);
+  color: var(--orange-700);
+}
+
+.category-chips .chip:disabled {
+  opacity: 0.45;
+  transform: none;
+}
+
+.chip-count {
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--sand);
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.chip-count:empty { display: none; }
+
+.chip[aria-pressed="true"] .chip-count {
+  background: var(--orange-100);
+  color: var(--orange-700);
+}
 
 .filter-tabs {
   position: relative;
@@ -1807,28 +1920,27 @@ button:disabled { cursor: not-allowed; }
 
 .product-media {
   position: relative;
-  display: grid;
-  place-items: center;
   aspect-ratio: 1;
   overflow: hidden;
-  background: var(--tint, var(--peach));
+  background: var(--sand);
   border-radius: 14px;
 }
 
-.product-art {
-  display: grid;
-  place-items: center;
+.product-img {
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  transition:
+    scale 700ms var(--ease-out),
+    filter 300ms var(--ease-out);
 }
 
-.product-art svg {
-  width: 74%;
-  transition: transform 500ms var(--ease-spring);
-}
+.product-card:hover .product-img { scale: 1.06; }
 
-.product-card:hover .product-art svg {
-  transform: translateY(-6px) rotate(-4deg) scale(1.05);
+/* stok habis: foto dipudarkan, tombol tambah nonaktif */
+.product-card.is-out .product-img {
+  filter: grayscale(0.7) brightness(0.95);
+  opacity: 0.75;
 }
 
 .badge {
@@ -1852,6 +1964,11 @@ button:disabled { cursor: not-allowed; }
   background: var(--white);
   color: var(--orange-700);
   box-shadow: var(--shadow-sm);
+}
+
+.badge--out {
+  background: var(--ink-2);
+  color: var(--white);
 }
 
 .wish-btn {
@@ -1891,11 +2008,20 @@ button:disabled { cursor: not-allowed; }
 }
 
 .product-cat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   color: var(--muted);
   font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.product-cat .icon {
+  width: 14px;
+  height: 14px;
+  color: var(--orange-600);
 }
 
 .product-name {
@@ -1974,6 +2100,14 @@ button:disabled { cursor: not-allowed; }
 .add-btn.is-added,
 .product-card:hover .add-btn.is-added { background: var(--success); box-shadow: none; }
 
+.add-btn:disabled,
+.product-card:hover .add-btn:disabled {
+  background: var(--sand);
+  color: #A8968A;
+  box-shadow: none;
+  transform: none;
+}
+
 /* skeleton loading */
 
 .product-card.is-skeleton { pointer-events: none; }
@@ -2014,7 +2148,21 @@ button:disabled { cursor: not-allowed; }
   animation: fadeUp 500ms var(--ease-out) both;
 }
 
-.grid-state-art { width: 132px; }
+.grid-state-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 4px;
+  border-radius: 50%;
+  background: var(--peach);
+  color: var(--orange-600);
+}
+
+.grid-state-icon .icon {
+  width: 28px;
+  height: 28px;
+}
 
 .grid-state h3 {
   color: var(--ink);
@@ -2686,13 +2834,14 @@ button:disabled { cursor: not-allowed; }
   place-items: center;
   width: 44px;
   height: 44px;
+  overflow: hidden;
+  border: 2px solid var(--white);
   border-radius: 50%;
   background: var(--orange-500);
   box-shadow: var(--shadow-orange);
   pointer-events: none;
 }
 
-.fly-dot svg { width: 80%; }
 
 .back-top {
   position: fixed;
@@ -2924,11 +3073,11 @@ button:disabled { cursor: not-allowed; }
 
   .container { padding-inline: 24px; }
 
-  .category-list {
+  .pet-list {
     margin-inline: -24px;
     padding-inline: 24px;
     scroll-padding-inline: 24px;
-    grid-auto-columns: minmax(180px, 34%);
+    grid-auto-columns: minmax(220px, 40%);
   }
 
   .product-grid { gap: 16px; }
@@ -2950,15 +3099,23 @@ button:disabled { cursor: not-allowed; }
 
 @media (min-width: 768px) {
 
-  .category-list {
+  .pet-list {
     grid-auto-flow: row;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     margin-inline: 0;
     padding: 0;
     overflow: visible;
   }
 
   .product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+  .category-chips {
+    flex-wrap: wrap;
+    width: auto;
+    margin-inline: 0;
+    padding-inline: 0;
+    overflow: visible;
+  }
 
   .brand-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
@@ -3098,7 +3255,6 @@ button:disabled { cursor: not-allowed; }
 
 @media (min-width: 1100px) {
 
-  .category-list { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 
   .product-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));

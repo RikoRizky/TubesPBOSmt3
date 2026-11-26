@@ -1,3 +1,11 @@
+/** Jenis hewan yang dilayani MeowPlace. */
+export enum PetType {
+  Kucing = 'kucing',
+  Anjing = 'anjing',
+  Burung = 'burung',
+  Ikan = 'ikan',
+}
+
 /** Kategori produk. Nilainya sama dengan yang dikirim backend. */
 export enum Category {
   Makanan = 'makanan',

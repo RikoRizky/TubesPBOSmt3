@@ -127,7 +127,7 @@
     <div class="container">
       <form class="search-form" data-search-form role="search">
         <svg class="icon"><use href="#i-search" /></svg>
-        <input type="search" class="search-input" data-search-input placeholder="Cari makanan, camilan, mainan…" aria-label="Kata kunci pencarian" autocomplete="off">
+        <input type="search" class="search-input" data-search-input placeholder="Cari produk kucing, anjing, burung, ikan…" aria-label="Kata kunci pencarian" autocomplete="off">
         <kbd class="search-kbd">Esc</kbd>
         <button type="button" class="icon-btn" data-search-close aria-label="Tutup pencarian">
           <svg class="icon"><use href="#i-close" /></svg>
@@ -172,7 +172,7 @@
 
         <!-- visual dekoratif (desktop) -->
         <div class="help-hero-visual" aria-hidden="true">
-          <div class="help-orb"><div class="help-orb-art" data-art="bed:cream"></div></div>
+          <div class="help-orb"><img src="./assets/images/help-pets.jpg" width="640" height="640" alt=""></div>
           <div class="chat-bubble chat-bubble--q">
             <span class="chat-avatar">R</span>
             <p>Paketku sudah sampai mana, ya?</p>
@@ -517,7 +517,7 @@
               <fieldset class="field field--full" aria-describedby="return-reason-error">
                 <legend class="field-label">Alasan pengembalian</legend>
                 <div class="reason-group">
-                  <label class="reason"><input type="radio" name="reason" value="doyan"><span>Kucing nggak doyan <small>Garansi Lahap</small></span></label>
+                  <label class="reason"><input type="radio" name="reason" value="doyan"><span>Hewan nggak doyan <small>Garansi Lahap</small></span></label>
                   <label class="reason"><input type="radio" name="reason" value="rusak"><span>Produk rusak / cacat</span></label>
                   <label class="reason"><input type="radio" name="reason" value="salah"><span>Salah kirim</span></label>
                   <label class="reason"><input type="radio" name="reason" value="lainnya"><span>Alasan lain</span></label>
@@ -629,8 +629,8 @@
                   <div class="faq-a" id="faq-a8" role="region" aria-labelledby="faq-q8"><div><p>Ya. Kami membeli langsung dari distributor resmi, dan makanan disimpan di gudang bersuhu terkontrol sampai dikirim.</p></div></div>
                 </div>
                 <div class="faq-item">
-                  <h4 class="faq-h"><button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a9" id="faq-q9">Kucingku punya alergi, produk mana yang cocok?<span class="faq-icon" aria-hidden="true"><svg class="icon"><use href="#i-plus" /></svg></span></button></h4>
-                  <div class="faq-a" id="faq-a9" role="region" aria-labelledby="faq-q9"><div><p>Pakai layanan chat dokter hewan (gratis) supaya rekomendasinya sesuai kondisi kucingmu. Siapkan info umur, berat, dan gejala alerginya.</p></div></div>
+                  <h4 class="faq-h"><button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a9" id="faq-q9">Hewanku punya alergi, produk mana yang cocok?<span class="faq-icon" aria-hidden="true"><svg class="icon"><use href="#i-plus" /></svg></span></button></h4>
+                  <div class="faq-a" id="faq-a9" role="region" aria-labelledby="faq-q9"><div><p>Pakai layanan chat dokter hewan (gratis) supaya rekomendasinya sesuai kondisi kucing, anjing, burung, atau ikanmu. Siapkan info jenis, umur, berat, dan gejalanya.</p></div></div>
                 </div>
               </div>
             </div>
@@ -742,7 +742,7 @@
             </svg>
             <span class="logo-text">Meow<span>Place</span></span>
           </a>
-          <p class="footer-text">Petshop online khusus kucing. Produk original, dikirim dengan penuh cinta sejak 2019.</p>
+          <p class="footer-text">Petshop online untuk kucing, anjing, burung, dan ikan. Produk original, dikirim dengan penuh cinta sejak 2019.</p>
           <ul class="social-list">
             <li><a href="#" class="social-link" aria-label="Instagram"><svg class="icon"><use href="#i-instagram" /></svg></a></li>
             <li><a href="#" class="social-link" aria-label="TikTok"><svg class="icon"><use href="#i-tiktok" /></svg></a></li>
@@ -754,10 +754,10 @@
         <div class="footer-col">
           <p class="footer-heading">Belanja</p>
           <ul class="footer-links">
-            <li><a href="index.html?kategori=makanan#belanja">Makanan</a></li>
-            <li><a href="index.html?kategori=camilan#belanja">Camilan</a></li>
-            <li><a href="index.html?kategori=mainan#belanja">Mainan</a></li>
-            <li><a href="index.html?kategori=perlengkapan#belanja">Perlengkapan</a></li>
+            <li><a href="index.html?hewan=kucing#belanja">Kucing</a></li>
+            <li><a href="index.html?hewan=anjing#belanja">Anjing</a></li>
+            <li><a href="index.html?hewan=burung#belanja">Burung</a></li>
+            <li><a href="index.html?hewan=ikan#belanja">Ikan</a></li>
             <li><a href="index.html#promo">Promo</a></li>
           </ul>
         </div>
@@ -812,9 +812,9 @@
     <ul class="cart-list" data-cart-list></ul>
 
     <div class="cart-empty" data-cart-empty>
-      <div class="cart-empty-art" data-art="bed:cream"></div>
+      <img class="cart-empty-photo" src="./assets/images/empty-sleep.jpg" width="400" height="400" loading="lazy" alt="">
       <h3>Keranjangmu masih kosong</h3>
-      <p>Si meong lagi tidur siang. Yuk, siapkan camilan buat waktu dia bangun.</p>
+      <p>Anabulmu lagi tidur siang. Yuk, siapkan camilan buat waktu dia bangun.</p>
       <a href="index.html#belanja" class="btn btn-primary btn-sm" data-cart-close>Mulai Belanja</a>
     </div>
 
