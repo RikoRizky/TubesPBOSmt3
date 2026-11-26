@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MeowPlace.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4409989f0a38226a09a2b866a625038365b13cf6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9f9b883d4d0d1d94a1cea09fc5a8fbdbf331b94e")]
 [assembly: System.Reflection.AssemblyProductAttribute("MeowPlace.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MeowPlace.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

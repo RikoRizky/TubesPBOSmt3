@@ -10,11 +10,11 @@
         "projectUniqueName": "/Users/rikorizky/TubesPBOSmt3/Backend/MeowPlace.Api/MeowPlace.Api.csproj",
         "projectName": "MeowPlace.Api",
         "projectPath": "/Users/rikorizky/TubesPBOSmt3/Backend/MeowPlace.Api/MeowPlace.Api.csproj",
-        "packagesPath": "/tmp/.nuget/packages/",
+        "packagesPath": "/Users/rikorizky/.nuget/packages/",
         "outputPath": "/Users/rikorizky/TubesPBOSmt3/Backend/MeowPlace.Api/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/tmp/.nuget/NuGet/NuGet.Config"
+          "/Users/rikorizky/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
